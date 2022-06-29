@@ -1,0 +1,10 @@
+let helper1 = func() void {
+    let z = 10;
+}
+
+let main = func() int32 {
+    let y = 10;
+    let x = y + 10;
+
+    return x;
+}
