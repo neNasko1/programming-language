@@ -4,7 +4,28 @@
 #include <memory>
 #include <iostream>
 
+namespace grammar {
+
+struct ast_node;
+struct expression;
+struct statement;
+struct number_literal;
+struct identifier_literal;
+struct binary_expression;
+struct expression_statement;
+struct list_statement;
+struct let_statement;
+struct return_statement;
+struct global_declaration;
+struct function_declaration;
+struct program;
+
+};
+
 #include "lexing.h"
+#include "parsing.h"
+
+// TODO: make all fields const
 
 namespace grammar {
 
@@ -15,8 +36,12 @@ struct ast_node {
 };
 
 struct expression : public ast_node {
-    expression() = default;
+    size_t type;
+
+    expression();
     virtual ~expression() = default;
+
+    virtual void try_infering_type(parsing::context &context) = 0;
 };
 
 struct statement : public ast_node {
@@ -29,7 +54,9 @@ struct number_literal : public expression {
 
     number_literal(const std::string_view value);
     ~number_literal() = default;
+
     void print(std::ostream &out, const size_t identation) const;
+    void try_infering_type(parsing::context &context);
 };
 
 struct identifier_literal : public expression {
@@ -39,6 +66,7 @@ struct identifier_literal : public expression {
     ~identifier_literal() = default;
     
     void print(std::ostream &out, const size_t identation) const;
+    void try_infering_type(parsing::context &context);
 };
 
 struct binary_expression : public expression {
@@ -50,6 +78,7 @@ struct binary_expression : public expression {
     ~binary_expression() = default;
     
     void print(std::ostream &out, const size_t identation) const;
+    void try_infering_type(parsing::context &context);
 };
 
 struct expression_statement : public statement {
@@ -62,7 +91,7 @@ struct expression_statement : public statement {
 };
 
 struct list_statement : public statement {
-    std::vector<std::unique_ptr<statement> > body;
+    const std::vector<std::unique_ptr<statement> > body;
 
     list_statement() = default;
     list_statement(std::vector<std::unique_ptr<statement> > &body);
@@ -111,9 +140,9 @@ struct function_declaration : public global_declaration {
 };
 
 struct program : public ast_node {
-    std::vector<std::unique_ptr<global_declaration> > definitions;
+    const std::vector<std::unique_ptr<global_declaration> > definitions;
 
-    program() = default;
+    program(std::vector<std::unique_ptr<global_declaration> > &definitions);
     ~program() = default;
     void print(std::ostream &out, const size_t identation) const;
 };

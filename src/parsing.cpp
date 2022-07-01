@@ -228,13 +228,13 @@ std::unique_ptr<grammar::global_declaration> parser::parse_definition() {
 }
 
 std::unique_ptr<grammar::program> parser::parse_program() {
-    std::unique_ptr<grammar::program> ret = std::make_unique<grammar::program>();
+    std::vector<std::unique_ptr<grammar::global_declaration> > definitions;
 
     while(this->peek().type != lexing::token_type::END_OF_FILE) {
-        ret->definitions.push_back(std::move(this->parse_definition()));
+        definitions.push_back(std::move(this->parse_definition()));
     }
 
-    return ret;
+    return std::make_unique<grammar::program>(definitions);
 }
 
 };

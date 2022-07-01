@@ -5,8 +5,14 @@
 #include <cassert>
 #include <stack>
 
+namespace parsing {
+struct parser;
+struct context;
+};
+
 #include "lexing.h"
 #include "grammar.h"
+#include "typing.h"
 
 namespace parsing {
 
@@ -34,6 +40,11 @@ struct parser {
     std::unique_ptr<grammar::program> parse_program();
 };
 
-#undef HARD_MATCH
+struct context {
+    typing::type_system type_system;
+
+    context() = default;
+    ~context() = default;
+};
 
 };

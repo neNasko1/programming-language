@@ -1,9 +1,14 @@
 #include <iostream>
 #include <string_view>
+#include <assert.h>
 
 #include "grammar.h"
+#include "typing.h"
+#include "parsing.h"
 
 namespace grammar {
+
+expression::expression() : type(typing::NOT_INFERED_ID) {}
 
 number_literal::number_literal(const std::string_view value) : value(value) {}
 
@@ -13,6 +18,11 @@ void number_literal::print(std::ostream &out, const size_t ident) const {
     out << tabulation << "number(" << this->value << ")" << std::endl;
 }
 
+void number_literal::try_infering_type(parsing::context &context) {
+    const auto res = context.type_system.find_type(typing::string_comparator("i32"));
+    assert(res.first);
+    this->type = res.second;
+}
 
 identifier_literal::identifier_literal(const std::string_view value) : value(value) {}
 
@@ -22,6 +32,9 @@ void identifier_literal::print(std::ostream &out, const size_t ident) const {
     out << tabulation << "identifier(" << this->value << ")" << std::endl;
 }
 
+void identifier_literal::try_infering_type(parsing::context &context) {
+    // assert(false);
+}
 
 binary_expression::binary_expression(std::unique_ptr<expression> lft, const lexing::token &op, std::unique_ptr<expression> rght)
     : lft(std::move(lft)), op(op), rght(std::move(rght)) {}
@@ -36,6 +49,9 @@ void binary_expression::print(std::ostream &out, const size_t ident) const {
     out << tabulation << ")" << std::endl;
 }
 
+void binary_expression::try_infering_type(parsing::context &context) {
+    // assert(false);
+}
 
 expression_statement::expression_statement(std::unique_ptr<expression> expr) : expr(std::move(expr)) {}
 
@@ -96,6 +112,8 @@ void function_declaration::print(std::ostream &out, const size_t ident) const {
     out << tabulation << "function " << this->name << " : " << this->type << std::endl;
     this->body->print(out, ident);
 }
+
+program::program(std::vector<std::unique_ptr<global_declaration> > &definitions) : definitions(std::move(definitions)) {}
 
 void program::print(std::ostream &out, const size_t ident) const {
     std::string tabulation = std::string(ident, '\t');
