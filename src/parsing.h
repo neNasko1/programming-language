@@ -42,9 +42,27 @@ struct parser {
 
 struct context {
     typing::type_system type_system;
+    std::map<typing::string_comparator, const grammar::let_statement*> variables;
 
     context() = default;
     ~context() = default;
+
+    void create_variable(const typing::string_comparator &comp, const grammar::let_statement* definition);
+    std::optional<const grammar::let_statement*> get_variable_definition(const typing::string_comparator &comp) const;
 };
+
+void context::create_variable(const typing::string_comparator &comp, const grammar::let_statement* definition) {
+    this->variables[comp] = definition;
+}
+
+std::optional<const grammar::let_statement*> context::get_variable_definition(const typing::string_comparator &comp) const {
+    const auto res = this->variables.find(comp);
+
+    if(res == this->variables.end()) {
+        return std::nullopt;
+    } else {
+        return std::make_optional(res->second);
+    }
+}
 
 };

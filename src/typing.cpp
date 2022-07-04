@@ -21,10 +21,12 @@ const string_comparator &simple_type::get_comp() const {
 
 // Assume that indexing is correct, TODO: learn how to use c++
 type_system::type_system() {
+    // Adding this types should always result in ids 0, 1 ... 
     assert(this->add_or_get_type(std::make_shared<simple_type>("not_infered")).second == NOT_INFERED_ID); // Assert that the 
     assert(this->add_or_get_type(std::make_shared<simple_type>("void")).second == VOID_ID);
+
+    this->add_or_get_type(std::make_shared<simple_type>("i8"));
     this->add_or_get_type(std::make_shared<simple_type>("i32"));
-    this->add_or_get_type(std::make_shared<simple_type>("i64"));
 }
 
 std::pair<bool, size_t> type_system::add_or_get_type(const std::shared_ptr<type> &type) {

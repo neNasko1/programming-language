@@ -19,8 +19,10 @@ void number_literal::print(std::ostream &out, const size_t ident) const {
 }
 
 void number_literal::try_infering_type(parsing::context &context) {
+    if(this->type != typing::NOT_INFERED_ID) { return; }
+
     const auto res = context.type_system.find_type(typing::string_comparator("i32"));
-    assert(res.first);
+    assert(res.first); // Assert that there is an i32 type
     this->type = res.second;
 }
 
@@ -34,6 +36,15 @@ void identifier_literal::print(std::ostream &out, const size_t ident) const {
 
 void identifier_literal::try_infering_type(parsing::context &context) {
     // assert(false);
+    if(this->type != typing::NOT_INFERED_ID) { return; }
+
+    // TODO: Remove
+    const auto res = context.get_variable_definition(typing::string_comparator(std::string(this->value)));
+    assert(res); 
+
+    const auto res_type = context.type_system.find_type(typing::string_comparator(std::string(res.value()->type)));
+    assert(res_type.first);
+    this->type = res_type.second;
 }
 
 binary_expression::binary_expression(std::unique_ptr<expression> lft, const lexing::token &op, std::unique_ptr<expression> rght)
