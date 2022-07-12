@@ -21,17 +21,20 @@ void number_literal::print(std::ostream &out, const size_t ident) const {
 void number_literal::try_infering_type(parsing::context &context) {
     if(this->type != typing::NOT_INFERED_ID) { return; }
 
-    this->type = typing::I32_ID;
+    this->type = typing::I64_ID;
 }
 
 void number_literal::emit_code(std::ostream &out, parsing::context &ctx) {
 	this->try_infering_type(ctx);
 	assert(this->type != typing::NOT_INFERED_ID);
 
+    const size_t INT64_SIZE = ctx.type_system.all_types[this->type]->size;
+	ctx.func_stack_ptr += INT64_SIZE;
 	this->stack_ptr = ctx.func_stack_ptr;
-	ctx.func_stack_ptr += 4;
 
-	out << "push " << this->value << "\n"; // Push the value to the stack
+    out << "mov rax, " << this->value << "\n";
+    out << "sub rsp, " << INT64_SIZE << "\n";
+    out << "mov [rsp], rax\n"; // Push the value to the stack
 }
 
 identifier_literal::identifier_literal(const std::string_view value) : value(value) {}
@@ -84,18 +87,23 @@ void binary_expression::emit_code(std::ostream &out, parsing::context &ctx) {
 	this->try_infering_type(ctx);
 	assert(this->type != typing::NOT_INFERED_ID);
 
-	assert(this->type == typing::I32_ID); // TODO: Handle different types of expressions
+	assert(this->type == typing::I64_ID); // TODO: Handle different types of expressions
 
 	this->lft->emit_code(out, ctx);
 	this->rght->emit_code(out, ctx);
 
 	switch(this->op.type) {
 		case lexing::token_type::PLUS: {
-			out << "mov " << " rax, " << "[rsp-" << ctx.func_stack_ptr - this->lft->stack_ptr << "]\n";
-			out << "add " << " rax, " << "[rsp-" << ctx.func_stack_ptr - this->rght->stack_ptr << "]\n";
-			out << "push " << " rax\n";
+			out << "mov " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->lft->stack_ptr << "]\n";
+			out << "add " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->rght->stack_ptr << "]\n";
+
+            const size_t TYPE_SIZE = ctx.type_system.all_types[this->type]->size;
+			ctx.func_stack_ptr += TYPE_SIZE;
 			this->stack_ptr = ctx.func_stack_ptr;
-			ctx.func_stack_ptr += 4;
+
+            out << "sub rsp," << TYPE_SIZE << "\n";
+            out << "mov [rsp], rax\n"; // Push the value to the stack
+
 			break;
 		}
 	}
@@ -165,13 +173,12 @@ void return_statement::emit_code(std::ostream &out, parsing::context &ctx) {
 	this->value->emit_code(out, ctx);
 
 	if(ctx.current_declaration->name == "_start") {
-		out << "mov rdi, " << "[rsp-" << ctx.func_stack_ptr - this->value->stack_ptr << "]\n";
+		out << "mov rdi, " << "[rsp+" << ctx.func_stack_ptr - this->value->stack_ptr << "]\n";
 		out << "mov rax, 60\n";
 		out << "syscall\n";
 	} else {
-		out << "mov rax, " << "[rsp-" << ctx.func_stack_ptr - this->value->stack_ptr << "]\n";
-		out << "ret\n";
-	}
+        assert(false);
+    }
 }
 
 function_declaration::function_declaration(const std::string_view name, const std::string_view type, std::unique_ptr<statement> body)

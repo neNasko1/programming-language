@@ -25,8 +25,6 @@ struct program;
 #include "lexing.h"
 #include "parsing.h"
 
-// TODO: make all fields const
-
 namespace grammar {
 
 struct ast_node {

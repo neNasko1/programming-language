@@ -36,10 +36,10 @@ type_system::type_system() {
     assert(this->add_or_get_type(std::make_shared<simple_type>("not_infered", 0)).second == NOT_INFERED_ID);
     assert(this->add_or_get_type(std::make_shared<simple_type>("void", 0)).second == VOID_ID);
     assert(this->add_or_get_type(std::make_shared<simple_type>("i32", 4)).second == I32_ID);
+    assert(this->add_or_get_type(std::make_shared<simple_type>("i64", 8)).second == I64_ID);
 
     this->add_or_get_type(std::make_shared<simple_type>("i8" , 1));
     this->add_or_get_type(std::make_shared<simple_type>("i16", 2));
-    this->add_or_get_type(std::make_shared<simple_type>("i64", 8));
 }
 
 std::pair<bool, size_t> type_system::add_or_get_type(const std::shared_ptr<type> &type) {
