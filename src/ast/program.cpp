@@ -30,6 +30,8 @@ void program::emit_code(std::ostream &out, parsing::context &ctx) {
 
 	for(const auto &decl : this->function_declarations) {
 		ctx.current_declaration = decl.get();
+        ctx.variables.clear();
+
 		decl->emit_code(out, ctx);
 		// TODO: Stack pointer should be cleared up
 	}

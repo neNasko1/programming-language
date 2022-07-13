@@ -209,6 +209,18 @@ std::unique_ptr<grammar::list_statement> parser::parse_list_statement() {
     return std::make_unique<grammar::list_statement>(body);
 }
 
+std::unique_ptr<grammar::function_declaration_parameter> parser::parse_function_declaration_parameter() {
+    const auto name_token = this->advance();
+    assert(name_token.type == lexing::token_type::IDENTIFIER);
+
+    assert(this->match(lexing::token_type::COLON));
+
+    const auto type_token = this->advance();
+    assert(type_token.type == lexing::token_type::IDENTIFIER);
+
+    return std::make_unique<grammar::function_declaration_parameter>(name_token.value, type_token.value);
+}
+
 std::unique_ptr<grammar::function_declaration> parser::parse_function_declaration() {
     assert(this->match(lexing::token_type::LET));
 
@@ -218,9 +230,17 @@ std::unique_ptr<grammar::function_declaration> parser::parse_function_declaratio
     assert(this->match(lexing::token_type::EQUAL));
     assert(this->match(lexing::token_type::FUNCTION));
 
-    // Currently there are no arguments
     assert(this->match(lexing::token_type::L_PAREN));
-    assert(this->match(lexing::token_type::R_PAREN));
+
+    std::vector<std::unique_ptr<grammar::function_declaration_parameter> > params;
+    while(!this->match(lexing::token_type::R_PAREN)) {
+        params.push_back(std::move(this->parse_function_declaration_parameter()));
+
+        if(!this->match(lexing::token_type::COMMA)) {
+            assert(this->match(lexing::token_type::R_PAREN));
+            break;
+        }
+    }
 
     const auto type_token = this->advance();
     assert(type_token.type == lexing::token_type::IDENTIFIER);
@@ -228,7 +248,7 @@ std::unique_ptr<grammar::function_declaration> parser::parse_function_declaratio
     auto body = this->parse_list_statement();
     assert(this->match(lexing::token_type::SEMICOLON));
 
-    return std::make_unique<grammar::function_declaration>(name_token.value, type_token.value, std::move(body));
+    return std::make_unique<grammar::function_declaration>(name_token.value, type_token.value, std::move(body), params);
 }
 
 std::unique_ptr<grammar::global_declaration> parser::parse_definition() {
@@ -251,11 +271,11 @@ std::unique_ptr<grammar::program> parser::parse_program() {
     return std::make_unique<grammar::program>(function_declarations);
 }
 
-void context::declare_variable(const typing::string_comparator &comp, const grammar::let_statement* definition) {
+void context::declare_variable(const typing::string_comparator &comp, const grammar::memory_cell* definition) {
 	this->variables[comp] = definition;
 }
 
-std::optional<const grammar::let_statement*> context::get_variable_definition(const typing::string_comparator &comp) const {
+std::optional<const grammar::memory_cell*> context::get_variable_definition(const typing::string_comparator &comp) const {
     const auto res = this->variables.find(comp);
 
     if(res == this->variables.end()) {

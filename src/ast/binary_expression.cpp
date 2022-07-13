@@ -26,15 +26,15 @@ void binary_expression::try_infering_type(parsing::context &context) {
 	this->lft->try_infering_type(context);
 	this->rght->try_infering_type(context);
 
-	assert(this->lft->type == this->rght->type);
-	this->type = this->lft->type;
+	assert(this->lft->memory->type == this->rght->memory->type);
+	this->memory->type = this->lft->memory->type;
 }
 
 void binary_expression::emit_code(std::ostream &out, parsing::context &ctx) {
 	this->try_infering_type(ctx);
-	assert(this->type != typing::NOT_INFERED_ID);
+	assert(this->memory->type != typing::NOT_INFERED_ID);
 
-	assert(this->type == typing::I64_ID); // TODO: Handle different types of expressions
+	assert(this->memory->type == typing::I64_ID); // TODO: Handle different types of expressions
 
 	this->lft->emit_code(out, ctx);
 	this->rght->emit_code(out, ctx);
@@ -43,12 +43,12 @@ void binary_expression::emit_code(std::ostream &out, parsing::context &ctx) {
 
 	switch(this->op.type) {
 		case lexing::token_type::PLUS: {
-			out << "\t mov " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->lft->stack_ptr << "]\n";
-			out << "\t add " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->rght->stack_ptr << "]\n";
+			out << "\t mov " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
+			out << "\t add " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
 
-            const size_t TYPE_SIZE = ctx.type_system.all_types[this->type]->size;
+            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
 			ctx.func_stack_ptr += TYPE_SIZE;
-			this->stack_ptr = ctx.func_stack_ptr;
+			this->memory->stack_ptr = ctx.func_stack_ptr;
             out << "\t sub rsp," << TYPE_SIZE << "\n";
             out << "\t mov [rsp], rax\n"; // Push the value to the stack
 

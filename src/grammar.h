@@ -6,6 +6,8 @@
 
 namespace grammar {
 
+struct memory_cell;
+
 struct ast_node;
 struct expression;
 struct statement;
@@ -20,6 +22,8 @@ struct let_statement;
 struct return_statement;
 
 struct global_declaration;
+
+struct function_declaration_parameter;
 struct function_declaration;
 
 struct program;
@@ -34,27 +38,37 @@ struct program;
 
 namespace grammar {
 
+// TODO: Make constant
+struct memory_cell {
+    size_t stack_ptr; // Location of the value
+    size_t type;
+
+    memory_cell(const size_t stack_ptr, const size_t type) : stack_ptr(stack_ptr), type(type) {}
+    ~memory_cell() = default;
+};
+
 struct ast_node {
     ast_node() = default;
     virtual ~ast_node() = default;
 
 	virtual void print(std::ostream &out, const size_t identation) const = 0;
-	virtual void emit_code(std::ostream &out, parsing::context &ctx) = 0;
 };
 
 struct expression : public ast_node {
-    size_t type;
-	size_t stack_ptr;
+    std::unique_ptr<memory_cell> memory;
 
-    expression() : type(typing::NOT_INFERED_ID), stack_ptr((size_t)-1) {};
+    expression() : memory(std::make_unique<memory_cell>((size_t)-1, typing::NOT_INFERED_ID)) {};
     virtual ~expression() = default;
 
     virtual void try_infering_type(parsing::context &context) = 0;
+	virtual void emit_code(std::ostream &out, parsing::context &ctx) = 0;
 };
 
 struct statement : public ast_node {
     statement() = default;
     virtual ~statement() = default;
+
+	virtual void emit_code(std::ostream &out, parsing::context &ctx) = 0;
 };
 
 struct global_declaration : public ast_node {
@@ -62,6 +76,7 @@ struct global_declaration : public ast_node {
     virtual ~global_declaration() = default;
 
     virtual void print(std::ostream &out, const size_t identation) const = 0;
+	virtual void emit_code(std::ostream &out, parsing::context &ctx) = 0;
 };
 
 };
@@ -76,6 +91,7 @@ struct global_declaration : public ast_node {
 #include "ast/let_statement.h"
 #include "ast/return_statement.h"
 
+#include "ast/function_declaration_parameter.h"
 #include "ast/function_declaration.h"
 
 #include "ast/program.h"

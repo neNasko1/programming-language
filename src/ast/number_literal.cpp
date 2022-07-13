@@ -18,18 +18,18 @@ void number_literal::print(std::ostream &out, const size_t ident) const {
 }
 
 void number_literal::try_infering_type(parsing::context &context) {
-    if(this->type != typing::NOT_INFERED_ID) { return; }
+    if(this->memory->type != typing::NOT_INFERED_ID) { return; }
 
-    this->type = typing::I64_ID;
+    this->memory->type = typing::I64_ID;
 }
 
 void number_literal::emit_code(std::ostream &out, parsing::context &ctx) {
 	this->try_infering_type(ctx);
-	assert(this->type != typing::NOT_INFERED_ID);
+	assert(this->memory->type != typing::NOT_INFERED_ID);
 
-    const size_t INT64_SIZE = ctx.type_system.all_types[this->type]->size;
+    const size_t INT64_SIZE = ctx.type_system.all_types[this->memory->type]->size;
 	ctx.func_stack_ptr += INT64_SIZE;
-	this->stack_ptr = ctx.func_stack_ptr;
+	this->memory->stack_ptr = ctx.func_stack_ptr;
 
     out << "\t ; number_literal " << this->value << std::endl;
 

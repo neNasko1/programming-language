@@ -1,8 +1,7 @@
-let helper = func() i64 {
-	return 7;
+let plus = func(x: i64, y: i64) i64 {
+	return 10 + x + y;
 }
 
 let main = func() i64 {
-	let x = helper();
-	return x + 7 + 10 + helper();
+	return 15 + plus(10, 20);
 }

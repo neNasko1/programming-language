@@ -12,7 +12,6 @@ namespace grammar {
 
 struct identifier_literal : public expression {
     const std::string_view name;
-    const let_statement *definition;
 
     identifier_literal(const std::string_view name);
     ~identifier_literal() = default;

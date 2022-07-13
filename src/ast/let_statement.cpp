@@ -27,20 +27,24 @@ void let_statement::print(std::ostream &out, const size_t ident) const {
 
 void let_statement::emit_code(std::ostream &out, parsing::context &ctx) {
     this->init_value->emit_code(out, ctx);
-    assert(this->init_value->type == typing::I64_ID);
+    assert(this->init_value->memory->type == typing::I64_ID);
 
-    this->type = this->init_value->type;
+    assert(this->init_value->memory->type == ctx.type_system.find_type(typing::string_comparator(this->type_hint)));
+
+    // this->type = this->init_value->type;
     // TODO: Match type with type_hint
 
-    assert(ctx.variables.find(this->name) == ctx.variables.end());
-    ctx.declare_variable(this->name, this);
+    assert(ctx.variables.find(this->name) == ctx.variables.end()); // Assert this is the first declaration of the variable
 
-    out << "\t mov rax, " << "[rsp+" << ctx.func_stack_ptr - this->init_value->stack_ptr << "]\n";
+    out << "\t mov rax, " << "[rsp+" << ctx.func_stack_ptr - this->init_value->memory->stack_ptr << "]\n";
 
-    const size_t VARIABLE_SIZE = ctx.type_system.all_types[this->init_value->type]->size;
+    const size_t VARIABLE_SIZE = ctx.type_system.all_types[this->init_value->memory->type]->size;
 	ctx.func_stack_ptr += VARIABLE_SIZE;
-	this->stack_ptr = ctx.func_stack_ptr;
     out << "\t sub rsp, " << VARIABLE_SIZE << "\n";
+
+    this->memory = std::make_unique<memory_cell>(ctx.func_stack_ptr, this->init_value->memory->type);
+    ctx.declare_variable(this->name, this->memory.get());
+
     out << "\t mov [rsp], rax\n"; // Push the value to the stack
 
     out << std::endl;

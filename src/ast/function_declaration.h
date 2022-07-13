@@ -14,10 +14,12 @@ struct function_declaration : public global_declaration {
     const std::string_view name;
     const std::string_view type_hint;
     const std::unique_ptr<statement> body;
+    const std::vector<std::unique_ptr<function_declaration_parameter> > params;
 
     size_t type;
+    size_t args_size;
 
-    function_declaration(const std::string_view name, const std::string_view type_hint, std::unique_ptr<statement> body);
+    function_declaration(const std::string_view name, const std::string_view type_hint, std::unique_ptr<statement> body, std::vector<std::unique_ptr<function_declaration_parameter> > &params);
     ~function_declaration() = default;
 
     void print(std::ostream &out, const size_t identation) const;

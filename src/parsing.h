@@ -37,6 +37,7 @@ struct parser {
     std::unique_ptr<grammar::list_statement> parse_list_statement();
     std::unique_ptr<grammar::let_statement> parse_let_statement();
     std::unique_ptr<grammar::return_statement> parse_return_statement();
+    std::unique_ptr<grammar::function_declaration_parameter> parse_function_declaration_parameter();
     std::unique_ptr<grammar::function_declaration> parse_function_declaration();
     std::unique_ptr<grammar::global_declaration> parse_definition();
     std::unique_ptr<grammar::program> parse_program();
@@ -44,7 +45,7 @@ struct parser {
 
 struct context {
     typing::type_system type_system;
-    std::map<typing::string_comparator, const grammar::let_statement*> variables;
+    std::map<typing::string_comparator, const grammar::memory_cell*> variables;
     std::map<typing::string_comparator, const grammar::function_declaration*> functions;
 
 	size_t func_stack_ptr = 0;
@@ -53,8 +54,8 @@ struct context {
     context() = default;
     ~context() = default;
 
-    void declare_variable(const typing::string_comparator &comp, const grammar::let_statement* definition);
-    std::optional<const grammar::let_statement*> get_variable_definition(const typing::string_comparator &comp) const;
+    void declare_variable(const typing::string_comparator &comp, const grammar::memory_cell* definition);
+    std::optional<const grammar::memory_cell*> get_variable_definition(const typing::string_comparator &comp) const;
 
     void declare_function(const typing::string_comparator &comp, const grammar::function_declaration* definition);
     std::optional<const grammar::function_declaration*> get_function_definition(const typing::string_comparator &comp) const;

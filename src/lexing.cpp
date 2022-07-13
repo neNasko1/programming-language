@@ -70,6 +70,10 @@ token lexer::recognise_special() {
         RETURN_TOKEN(1, token_type::R_SQUARE_BRACKET);
     } else if(this->match(';')) {
         RETURN_TOKEN(1, token_type::SEMICOLON);
+    } else if(this->match(',')) {
+        RETURN_TOKEN(1, token_type::COMMA);
+    } else if(this->match(':')) {
+        RETURN_TOKEN(1, token_type::COLON);
     }
 
     #undef RETURN_TOKEN
@@ -78,8 +82,6 @@ token lexer::recognise_special() {
 }
 
 void lexer::lex() {
-	std::cout << this->code << std::endl;
-
 	while(!this->is_at_end()) {
 		if(utils::character::is_alphabet(this->peek())) {
 			const size_t start = this->pic;
@@ -120,10 +122,6 @@ void lexer::lex() {
 	}
 
     tokens.push_back(token("", token_type::END_OF_FILE));
-
-	for(const auto &it : tokens) {
-        std::cout << it << std::endl;
-	}
 }
 
 namespace utils {
@@ -160,7 +158,9 @@ bool is_special(const char c) {
         c == '}' ||
         c == '[' ||
         c == ']' ||
-        c == ';';
+        c == ';' ||
+        c == ',' ||
+        c == ':';
 }
 
 };

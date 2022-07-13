@@ -19,12 +19,22 @@ int main(int argc, char **argv) {
     buffer << input_code.rdbuf();
 
     std::string code = buffer.str();
+
+    std::cout << "COMPILING..." << std::endl;
+    std::cout << code << std::endl;
+
     lexing::lexer lexer(code);
     lexer.lex();
+
+    std::cout << "LEXING..." << std::endl;
+    for(const auto &it : lexer.tokens) {
+        std::cout << it << std::endl;
+    }
 
     parsing::parser parser(lexer);
     const auto program = std::move(parser.parse_program());
 
+    std::cout << "PARSING AST..." << std::endl;
     program->print(std::cout, 0);
 
 	std::ofstream output_code(argv[2]);
