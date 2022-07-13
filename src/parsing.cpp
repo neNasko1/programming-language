@@ -105,7 +105,7 @@ std::unique_ptr<grammar::expression> parser::parse_expression() {
             if(this->match(lexing::token_type::L_PAREN)) {
                 assert(false);
                 // This is a function call
-             
+
                 // We need to roll back a lil bit
                 // Once for the L_PAREN
                 // Once for the function name
@@ -179,7 +179,7 @@ std::unique_ptr<grammar::return_statement> parser::parse_return_statement() {
 std::unique_ptr<grammar::list_statement> parser::parse_list_statement() {
     assert(this->match(lexing::token_type::L_BRACE));
 
-    std::vector<std::unique_ptr<grammar::statement> > body; 
+    std::vector<std::unique_ptr<grammar::statement> > body;
 
     while(this->peek().type != lexing::token_type::R_BRACE) {
         if(this->peek().type == lexing::token_type::LET) {
@@ -228,13 +228,28 @@ std::unique_ptr<grammar::global_declaration> parser::parse_definition() {
 }
 
 std::unique_ptr<grammar::program> parser::parse_program() {
-    std::vector<std::unique_ptr<grammar::global_declaration> > definitions;
+    std::vector<std::unique_ptr<grammar::function_declaration> > function_declarations;
 
     while(this->peek().type != lexing::token_type::END_OF_FILE) {
-        definitions.push_back(std::move(this->parse_definition()));
+        function_declarations.push_back(std::move(this->parse_function_declaration()));
     }
 
-    return std::make_unique<grammar::program>(definitions);
+    return std::make_unique<grammar::program>(function_declarations);
 }
+
+void context::create_variable(const typing::string_comparator &comp, const grammar::let_statement* definition) {
+	this->variables[comp] = definition;
+}
+
+std::optional<const grammar::let_statement*> context::get_variable_definition(const typing::string_comparator &comp) const {
+    const auto res = this->variables.find(comp);
+
+    if(res == this->variables.end()) {
+        return std::nullopt;
+    } else {
+        return std::make_optional(res->second);
+    }
+}
+
 
 };

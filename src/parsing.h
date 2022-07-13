@@ -4,6 +4,7 @@
 #include <memory>
 #include <cassert>
 #include <stack>
+#include <optional>
 
 namespace parsing {
 struct parser;
@@ -43,6 +44,8 @@ struct parser {
 struct context {
     typing::type_system type_system;
     std::map<typing::string_comparator, const grammar::let_statement*> variables;
+	size_t func_stack_ptr = 0;
+	grammar::function_declaration* current_declaration;
 
     context() = default;
     ~context() = default;
@@ -50,19 +53,5 @@ struct context {
     void create_variable(const typing::string_comparator &comp, const grammar::let_statement* definition);
     std::optional<const grammar::let_statement*> get_variable_definition(const typing::string_comparator &comp) const;
 };
-
-void context::create_variable(const typing::string_comparator &comp, const grammar::let_statement* definition) {
-    this->variables[comp] = definition;
-}
-
-std::optional<const grammar::let_statement*> context::get_variable_definition(const typing::string_comparator &comp) const {
-    const auto res = this->variables.find(comp);
-
-    if(res == this->variables.end()) {
-        return std::nullopt;
-    } else {
-        return std::make_optional(res->second);
-    }
-}
 
 };

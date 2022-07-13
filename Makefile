@@ -23,6 +23,10 @@ test:
 	@make
 	@./test.sh
 
+debug:
+	@./compiler code.txt compiled.asm
+	@nasm -f elf64 -g -F dwarf -o compiled.o compiled.asm && ld -o compiled compiled.o && gdb compiled -tui
+
 recompile:
 	@make rm
 	@make test

@@ -21,9 +21,17 @@ void number_literal::print(std::ostream &out, const size_t ident) const {
 void number_literal::try_infering_type(parsing::context &context) {
     if(this->type != typing::NOT_INFERED_ID) { return; }
 
-    const auto res = context.type_system.find_type(typing::string_comparator("i32"));
-    assert(res.first); // Assert that there is an i32 type
-    this->type = res.second;
+    this->type = typing::I32_ID;
+}
+
+void number_literal::emit_code(std::ostream &out, parsing::context &ctx) {
+	this->try_infering_type(ctx);
+	assert(this->type != typing::NOT_INFERED_ID);
+
+	this->stack_ptr = ctx.func_stack_ptr;
+	ctx.func_stack_ptr += 4;
+
+	out << "push " << this->value << "\n"; // Push the value to the stack
 }
 
 identifier_literal::identifier_literal(const std::string_view value) : value(value) {}
@@ -39,12 +47,16 @@ void identifier_literal::try_infering_type(parsing::context &context) {
     if(this->type != typing::NOT_INFERED_ID) { return; }
 
     // TODO: Remove
-    const auto res = context.get_variable_definition(typing::string_comparator(std::string(this->value)));
-    assert(res); 
+    const auto res = context.get_variable_definition(typing::string_comparator(this->value));
+    assert(res);
 
     const auto res_type = context.type_system.find_type(typing::string_comparator(std::string(res.value()->type)));
     assert(res_type.first);
-    this->type = res_type.second;
+	this->type = res_type.second;
+}
+
+void identifier_literal::emit_code(std::ostream &out, parsing::context &ctx) {
+	assert(false);
 }
 
 binary_expression::binary_expression(std::unique_ptr<expression> lft, const lexing::token &op, std::unique_ptr<expression> rght)
@@ -61,7 +73,32 @@ void binary_expression::print(std::ostream &out, const size_t ident) const {
 }
 
 void binary_expression::try_infering_type(parsing::context &context) {
-    // assert(false);
+	this->lft->try_infering_type(context);
+	this->rght->try_infering_type(context);
+
+	assert(this->lft->type == this->rght->type);
+	this->type = this->lft->type;
+}
+
+void binary_expression::emit_code(std::ostream &out, parsing::context &ctx) {
+	this->try_infering_type(ctx);
+	assert(this->type != typing::NOT_INFERED_ID);
+
+	assert(this->type == typing::I32_ID); // TODO: Handle different types of expressions
+
+	this->lft->emit_code(out, ctx);
+	this->rght->emit_code(out, ctx);
+
+	switch(this->op.type) {
+		case lexing::token_type::PLUS: {
+			out << "mov " << " rax, " << "[rsp-" << ctx.func_stack_ptr - this->lft->stack_ptr << "]\n";
+			out << "add " << " rax, " << "[rsp-" << ctx.func_stack_ptr - this->rght->stack_ptr << "]\n";
+			out << "push " << " rax\n";
+			this->stack_ptr = ctx.func_stack_ptr;
+			ctx.func_stack_ptr += 4;
+			break;
+		}
+	}
 }
 
 expression_statement::expression_statement(std::unique_ptr<expression> expr) : expr(std::move(expr)) {}
@@ -74,6 +111,9 @@ void expression_statement::print(std::ostream &out, const size_t ident) const {
     out << tabulation << ")" << std::endl;
 }
 
+void expression_statement::emit_code(std::ostream &out, parsing::context &ctx) {
+	this->expr->emit_code(out, ctx);
+}
 
 list_statement::list_statement(std::vector<std::unique_ptr<statement> > &body) : body(std::move(body)) {}
 
@@ -87,6 +127,11 @@ void list_statement::print(std::ostream &out, const size_t ident) const {
     out << tabulation << "}" << std::endl;
 }
 
+void list_statement::emit_code(std::ostream &out, parsing::context &ctx) {
+	for(const auto &stat : this->body) {
+		stat->emit_code(out, ctx);
+	}
+}
 
 let_statement::let_statement(const std::string_view name, std::unique_ptr<expression> init_value) : name(name), type(""), init_value(std::move(init_value)) {}
 
@@ -103,6 +148,9 @@ void let_statement::print(std::ostream &out, const size_t ident) const {
     this->init_value->print(out, ident + 1);
 }
 
+void let_statement::emit_code(std::ostream &out, parsing::context &ctx) {
+	assert(false);
+}
 
 return_statement::return_statement(std::unique_ptr<expression> value) : value(std::move(value)) {}
 
@@ -113,9 +161,22 @@ void return_statement::print(std::ostream &out, const size_t ident) const {
     this->value->print(out, ident + 1);
 }
 
+void return_statement::emit_code(std::ostream &out, parsing::context &ctx) {
+	this->value->emit_code(out, ctx);
 
-function_declaration::function_declaration(const std::string_view name, const std::string_view type, std::unique_ptr<statement> body) 
-    : name(name), type(type), body(std::move(body)) {}
+	if(ctx.current_declaration->name == "_start") {
+		out << "mov rdi, " << "[rsp-" << ctx.func_stack_ptr - this->value->stack_ptr << "]\n";
+		out << "mov rax, 60\n";
+		out << "syscall\n";
+	} else {
+		out << "mov rax, " << "[rsp-" << ctx.func_stack_ptr - this->value->stack_ptr << "]\n";
+		out << "ret\n";
+	}
+}
+
+function_declaration::function_declaration(const std::string_view name, const std::string_view type, std::unique_ptr<statement> body)
+    : name(name != "main" ? name : "_start"), type(type), body(std::move(body)) {
+}
 
 void function_declaration::print(std::ostream &out, const size_t ident) const {
     std::string tabulation = std::string(ident, '\t');
@@ -124,16 +185,33 @@ void function_declaration::print(std::ostream &out, const size_t ident) const {
     this->body->print(out, ident);
 }
 
-program::program(std::vector<std::unique_ptr<global_declaration> > &definitions) : definitions(std::move(definitions)) {}
+void function_declaration::emit_code(std::ostream &out, parsing::context &ctx) {
+	out << "global " << this->name << "\n";
+	out << this->name << ":\n";
+
+	this->body->emit_code(out, ctx);
+}
+
+
+program::program(std::vector<std::unique_ptr<function_declaration> > &function_declarations) : function_declarations(std::move(function_declarations)) {}
 
 void program::print(std::ostream &out, const size_t ident) const {
     std::string tabulation = std::string(ident, '\t');
 
     out << tabulation << "program(" << std::endl;
-    for(const auto &it : this->definitions) {
+    for(const auto &it : this->function_declarations) {
         it->print(out, ident + 1);
     }
     out << tabulation << ")" << std::endl;
+}
+
+void program::emit_code(std::ostream &out, parsing::context &ctx) {
+	out << "section .text\n";
+	for(const auto &decl : this->function_declarations) {
+		ctx.current_declaration = decl.get();
+		decl->emit_code(out, ctx);
+		// TODO: Stack pointer should be cleared up
+	}
 }
 
 };
