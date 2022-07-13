@@ -54,7 +54,7 @@ struct type_system {
     ~type_system() = default;
 
     std::pair<bool, size_t> add_or_get_type(const std::shared_ptr<type> &type);
-    std::pair<bool, size_t> find_type(const string_comparator &comp) const;
+    std::optional<size_t> find_type(const string_comparator &comp) const;
 };
 
 };

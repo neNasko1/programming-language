@@ -25,6 +25,25 @@ bool parser::is_at_end() const {
     return this->pit == this->tokens.size();
 }
 
+std::unique_ptr<grammar::expression> parser::parse_function_call() {
+    const std::string_view name = this->peek().value;
+    assert(this->match(lexing::token_type::IDENTIFIER));
+    assert(this->match(lexing::token_type::L_PAREN));
+
+    std::vector<std::unique_ptr<grammar::expression> > args; 
+
+    while(!this->match(lexing::token_type::R_PAREN)) {
+        args.push_back(std::move(this->parse_expression()));
+
+        if(!this->match(lexing::token_type::COMMA)) {
+            assert(this->match(lexing::token_type::R_PAREN));
+            break;
+        }
+    }
+
+    return std::make_unique<grammar::function_call>(name, std::move(args));
+}
+
 // Copied from https://github.com/neNasko1/fake-script/blob/main/src/grammar.cpp
 std::unique_ptr<grammar::expression> parser::parse_expression() {
     std::stack<std::unique_ptr<grammar::expression> > expression_stack;
@@ -33,10 +52,7 @@ std::unique_ptr<grammar::expression> parser::parse_expression() {
     int cnt_lparen = 0;
 
     const auto combine_top = [&]() {
-        if(operation_stack.empty()) {
-            std::cerr << "There are no operations in the operation stack\n There must be some problem" << std::endl;
-            exit(-1);
-        }
+        assert(!operation_stack.empty());
 
         const auto op = operation_stack.top(); operation_stack.pop();
         if(lexing::utils::op::is_unary(op)) {
@@ -103,14 +119,13 @@ std::unique_ptr<grammar::expression> parser::parse_expression() {
 
         } else if(current_token.type == lexing::token_type::IDENTIFIER) {
             if(this->match(lexing::token_type::L_PAREN)) {
-                assert(false);
                 // This is a function call
 
                 // We need to roll back a lil bit
                 // Once for the L_PAREN
                 // Once for the function name
-                // this->pit -= 2;
-                // expression_stack.push(this->recognise_function_call());
+                this->pit -= 2;
+                expression_stack.push(this->parse_function_call());
             } else {
                 expression_stack.push(std::make_unique<grammar::identifier_literal>(current_token.value));
             }
@@ -123,7 +138,6 @@ std::unique_ptr<grammar::expression> parser::parse_expression() {
             continue;
 
         } else {
-            std::cerr << "Unexpected token in expression declaration " << current_token << std::endl;
             assert(false);
         }
     }
@@ -237,7 +251,7 @@ std::unique_ptr<grammar::program> parser::parse_program() {
     return std::make_unique<grammar::program>(function_declarations);
 }
 
-void context::create_variable(const typing::string_comparator &comp, const grammar::let_statement* definition) {
+void context::declare_variable(const typing::string_comparator &comp, const grammar::let_statement* definition) {
 	this->variables[comp] = definition;
 }
 
@@ -251,5 +265,18 @@ std::optional<const grammar::let_statement*> context::get_variable_definition(co
     }
 }
 
+void context::declare_function(const typing::string_comparator &comp, const grammar::function_declaration* definition) {
+	this->functions[comp] = definition;
+}
+
+std::optional<const grammar::function_declaration*> context::get_function_definition(const typing::string_comparator &comp) const {
+    const auto res = this->functions.find(comp);
+
+    if(res == this->functions.end()) {
+        return std::nullopt;
+    } else {
+        return std::make_optional(res->second);
+    }
+}
 
 };

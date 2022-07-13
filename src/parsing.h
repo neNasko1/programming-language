@@ -32,6 +32,7 @@ struct parser {
     bool is_at_end() const;
 
     std::unique_ptr<grammar::expression> parse_expression();
+    std::unique_ptr<grammar::expression> parse_function_call();
     std::unique_ptr<grammar::expression_statement> parse_expression_statement();
     std::unique_ptr<grammar::list_statement> parse_list_statement();
     std::unique_ptr<grammar::let_statement> parse_let_statement();
@@ -44,14 +45,19 @@ struct parser {
 struct context {
     typing::type_system type_system;
     std::map<typing::string_comparator, const grammar::let_statement*> variables;
+    std::map<typing::string_comparator, const grammar::function_declaration*> functions;
+
 	size_t func_stack_ptr = 0;
 	grammar::function_declaration* current_declaration;
 
     context() = default;
     ~context() = default;
 
-    void create_variable(const typing::string_comparator &comp, const grammar::let_statement* definition);
+    void declare_variable(const typing::string_comparator &comp, const grammar::let_statement* definition);
     std::optional<const grammar::let_statement*> get_variable_definition(const typing::string_comparator &comp) const;
+
+    void declare_function(const typing::string_comparator &comp, const grammar::function_declaration* definition);
+    std::optional<const grammar::function_declaration*> get_function_definition(const typing::string_comparator &comp) const;
 };
 
 };

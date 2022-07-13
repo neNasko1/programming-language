@@ -31,11 +31,11 @@ void number_literal::emit_code(std::ostream &out, parsing::context &ctx) {
 	ctx.func_stack_ptr += INT64_SIZE;
 	this->stack_ptr = ctx.func_stack_ptr;
 
-    out << "; number_literal " << this->value << std::endl;
+    out << "\t ; number_literal " << this->value << std::endl;
 
-    out << "mov rax, " << this->value << "\n";
-    out << "sub rsp, " << INT64_SIZE << "\n";
-    out << "mov [rsp], rax\n"; // Push the value to the stack
+    out << "\t mov rax, " << this->value << "\n";
+    out << "\t sub rsp, " << INT64_SIZE << "\n";
+    out << "\t mov [rsp], rax\n"; // Push the value to the stack
 
     out << std::endl;
 }

@@ -22,11 +22,11 @@ void return_statement::emit_code(std::ostream &out, parsing::context &ctx) {
 	this->value->emit_code(out, ctx);
 
 	if(ctx.current_declaration->name == "_start") {
-		out << "mov rdi, " << "[rsp+" << ctx.func_stack_ptr - this->value->stack_ptr << "]\n";
-		out << "mov rax, 60\n";
-		out << "syscall\n";
+		out << "\t mov rdi, " << "[rsp+" << ctx.func_stack_ptr - this->value->stack_ptr << "]\n";
+        out << "\t jmp _cleanup_" << ctx.current_declaration->name << "\n";
 	} else {
-        assert(false);
+		out << "\t mov rax, " << "[rsp+" << ctx.func_stack_ptr - this->value->stack_ptr << "]\n";
+        out << "\t jmp _cleanup_" << ctx.current_declaration->name << "\n";
     }
 
     out << std::endl;

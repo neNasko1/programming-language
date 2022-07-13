@@ -11,7 +11,7 @@ token::~token() {}
 
 std::ostream& operator <<(std::ostream &out, const token &tkn) {
     if(tkn.type == token_type::NEW_LINE) {
-        return out << "\\n" << " " << reverse_token_type_names[tkn.type]; 
+        return out << "\t \\n" << " " << reverse_token_type_names[tkn.type]; 
     } else {
         return out << tkn.value << " " << reverse_token_type_names[tkn.type];
     }
@@ -115,6 +115,7 @@ void lexer::lex() {
 
 		} else {
 			std::cerr << "Unmatched character in lexing " << this->advance() << std::endl;
+            continue;
 		}
 	}
 
@@ -142,7 +143,7 @@ bool is_alphabet_or_digit(const char c) {
 }
 
 bool is_whitespace(const char c) {
-	return c == ' ' || c == '\n' || c == '\r';
+	return c == ' ' || c == '\n' || c == '\t';
 }
 
 bool is_special(const char c) {

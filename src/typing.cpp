@@ -55,12 +55,12 @@ std::pair<bool, size_t> type_system::add_or_get_type(const std::shared_ptr<type>
     assert(false);
 }
 
-std::pair<bool, size_t> type_system::find_type(const string_comparator &comp) const {
+std::optional<size_t> type_system::find_type(const string_comparator &comp) const {
     const auto res = this->type_map.find(comp);
     if(res != this->type_map.end()) {
-        return {true, res->second};
+        return std::make_optional(res->second);
     } else {
-        return {false, NOT_INFERED_ID};
+        return std::nullopt;
     }
 
     assert(false);

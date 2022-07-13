@@ -22,7 +22,12 @@ void program::print(std::ostream &out, const size_t ident) const {
 }
 
 void program::emit_code(std::ostream &out, parsing::context &ctx) {
-	out << "section .text\n";
+	out << "\t section .text\n";
+    for(const auto &decl : this->function_declarations) {
+        ctx.declare_function(decl->name, decl.get());
+        decl->try_infering_type(ctx);
+    }
+
 	for(const auto &decl : this->function_declarations) {
 		ctx.current_declaration = decl.get();
 		decl->emit_code(out, ctx);

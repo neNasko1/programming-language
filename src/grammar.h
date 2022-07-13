@@ -12,12 +12,16 @@ struct statement;
 struct number_literal;
 struct identifier_literal;
 struct binary_expression;
+struct function_call;
+
 struct expression_statement;
 struct list_statement;
 struct let_statement;
 struct return_statement;
+
 struct global_declaration;
 struct function_declaration;
+
 struct program;
 
 };
@@ -65,9 +69,13 @@ struct global_declaration : public ast_node {
 #include "ast/number_literal.h"
 #include "ast/identifier_literal.h"
 #include "ast/binary_expression.h"
+#include "ast/function_call.h"
+
 #include "ast/expression_statement.h"
 #include "ast/list_statement.h"
 #include "ast/let_statement.h"
 #include "ast/return_statement.h"
+
 #include "ast/function_declaration.h"
+
 #include "ast/program.h"

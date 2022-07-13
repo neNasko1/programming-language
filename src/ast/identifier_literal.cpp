@@ -32,15 +32,15 @@ void identifier_literal::emit_code(std::ostream &out, parsing::context &ctx) {
 
     assert(this->type == typing::I64_ID);
 
-    out << "; identifier_literal " << this->name << std::endl;
+    out << "\t ; identifier_literal " << this->name << std::endl;
 
-    out << "mov rax, " << "[rsp+" << ctx.func_stack_ptr - this->definition->stack_ptr << "]\n";
+    out << "\t mov rax, " << "[rsp+" << ctx.func_stack_ptr - this->definition->stack_ptr << "]\n";
 
     const size_t VARIABLE_SIZE = ctx.type_system.all_types[this->type]->size;
 	ctx.func_stack_ptr += VARIABLE_SIZE;
 	this->stack_ptr = ctx.func_stack_ptr;
-    out << "sub rsp, " << VARIABLE_SIZE << "\n";
-    out << "mov [rsp], rax\n"; // Push the value to the stack    
+    out << "\t sub rsp, " << VARIABLE_SIZE << "\n";
+    out << "\t mov [rsp], rax\n"; // Push the value to the stack    
 
     out << std::endl;
 }
