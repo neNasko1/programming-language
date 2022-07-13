@@ -32,7 +32,6 @@ size_t simple_type::get_size() const {
 // Assume that indexing is correct, TODO: learn how to use c++
 type_system::type_system() {
     // Adding this types should always result in ids 0, 1 ...
-	std::cerr << NOT_INFERED_ID << " " << VOID_ID << std::endl;
     assert(this->add_or_get_type(std::make_shared<simple_type>("not_infered", 0)).second == NOT_INFERED_ID);
     assert(this->add_or_get_type(std::make_shared<simple_type>("void", 0)).second == VOID_ID);
     assert(this->add_or_get_type(std::make_shared<simple_type>("i32", 4)).second == I32_ID);

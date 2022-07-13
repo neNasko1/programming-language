@@ -14,18 +14,15 @@ $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p "$$(dirname $@)"
 	g++ $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
-rm:
+clear:
 	@echo "Removing all compiled files"
 	@rm -r obj || :
 	@rm $(EXECUTABLE) || :
 
-test:
+run_compiler:
 	@make
-	@./test.sh
-
-debug:
-	@./compiler code.txt compiled.asm
-	@nasm -f elf64 -g -F dwarf -o compiled.o compiled.asm && ld -o compiled compiled.o && gdb compiled -tui
+	@./compiler code.txt asm/test.asm && cat asm/test.asm
+	@nasm -f elf64 -g -F dwarf -o asm/test.o asm/test.asm  && ld -o asm/test asm/test.o && ./asm/test && echo "Program exited with code" 0
 
 recompile:
 	@make rm

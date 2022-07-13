@@ -42,7 +42,7 @@ struct expression : public ast_node {
     size_t type;
 	size_t stack_ptr;
 
-    expression() : type(typing::NOT_INFERED_ID) {};
+    expression() : type(typing::NOT_INFERED_ID), stack_ptr((size_t)-1) {};
     virtual ~expression() = default;
 
     virtual void try_infering_type(parsing::context &context) = 0;

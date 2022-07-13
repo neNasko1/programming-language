@@ -9,29 +9,40 @@
 
 namespace grammar {
 
-identifier_literal::identifier_literal(const std::string_view value) : value(value) {}
+identifier_literal::identifier_literal(const std::string_view name) : name(name) {}
 
 void identifier_literal::print(std::ostream &out, const size_t ident) const {
     std::string tabulation = std::string(ident, '\t');
 
-    out << tabulation << "identifier(" << this->value << ")" << std::endl;
+    out << tabulation << "identifier(" << this->name << ")" << std::endl;
 }
 
 void identifier_literal::try_infering_type(parsing::context &context) {
-    // assert(false);
     if(this->type != typing::NOT_INFERED_ID) { return; }
 
-    // TODO: Remove
-    const auto res = context.get_variable_definition(typing::string_comparator(this->value));
+    const auto res = context.get_variable_definition(typing::string_comparator(this->name));
     assert(res);
+    this->definition = res.value();
 
-    const auto res_type = context.type_system.find_type(typing::string_comparator(std::string(res.value()->type)));
-    assert(res_type.first);
-	this->type = res_type.second;
+	this->type = this->definition->type;
 }
 
 void identifier_literal::emit_code(std::ostream &out, parsing::context &ctx) {
-	assert(false);
+    this->try_infering_type(ctx);
+
+    assert(this->type == typing::I64_ID);
+
+    out << "; identifier_literal " << this->name << std::endl;
+
+    out << "mov rax, " << "[rsp+" << ctx.func_stack_ptr - this->definition->stack_ptr << "]\n";
+
+    const size_t VARIABLE_SIZE = ctx.type_system.all_types[this->type]->size;
+	ctx.func_stack_ptr += VARIABLE_SIZE;
+	this->stack_ptr = ctx.func_stack_ptr;
+    out << "sub rsp, " << VARIABLE_SIZE << "\n";
+    out << "mov [rsp], rax\n"; // Push the value to the stack    
+
+    out << std::endl;
 }
 
 };

@@ -28,6 +28,8 @@ void return_statement::emit_code(std::ostream &out, parsing::context &ctx) {
 	} else {
         assert(false);
     }
+
+    out << std::endl;
 }
 
 };
