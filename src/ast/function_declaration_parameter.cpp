@@ -28,26 +28,9 @@ void function_declaration_parameter::emit_code(parsing::context &ctx) {
 
     this->type = res.value();
 
-    ctx.current_declaration->args_size += ctx.type_system.all_types[this->type]->size;
+	ctx.current_declaration->args_size += ctx.type_system.all_types[this->type]->size;
     this->memory = std::make_unique<memory_cell>(ctx.current_declaration->args_size, this->type);
     ctx.declare_variable(this->name, this->memory.get());
 }
-
-/*
-void function_declaration_parameter::emit_code(std::ostream &out, parsing::context &ctx) {
-    this->try_infering_type(ctx);
-
-    assert(ctx.variables.find(this->name) == ctx.variables.end()); // Assert this is the first declaration of the variable
-
-    const size_t VARIABLE_SIZE = ctx.type_system.all_types[this->type]->size;
-	ctx.func_stack_ptr += VARIABLE_SIZE;
-    out << "\t sub rsp, " << VARIABLE_SIZE << "\n";
-
-    this->memory = std::make_unique<memory_cell>(ctx.func_stack_ptr, this->type);
-    ctx.declare_variable(this->name, this->memory.get());
-
-    out << std::endl;
-}
-*/
 
 };

@@ -36,16 +36,13 @@ void let_statement::emit_code(std::ostream &out, parsing::context &ctx) {
 
     assert(ctx.variables.find(this->name) == ctx.variables.end()); // Assert this is the first declaration of the variable
 
-    out << "\t mov rax, " << "[rsp+" << ctx.func_stack_ptr - this->init_value->memory->stack_ptr << "]\n";
+    out << "\t push " << "[rsp+" << ctx.func_stack_ptr - this->init_value->memory->stack_ptr << "]\n";
 
     const size_t VARIABLE_SIZE = ctx.type_system.all_types[this->init_value->memory->type]->size;
 	ctx.func_stack_ptr += VARIABLE_SIZE;
-    out << "\t sub rsp, " << VARIABLE_SIZE << "\n";
 
     this->memory = std::make_unique<memory_cell>(ctx.func_stack_ptr, this->init_value->memory->type);
     ctx.declare_variable(this->name, this->memory.get());
-
-    out << "\t mov [rsp], rax\n"; // Push the value to the stack
 
     out << std::endl;
 }

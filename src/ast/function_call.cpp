@@ -20,7 +20,7 @@ void function_call::print(std::ostream &out, const size_t ident) const {
         out << tabulation <<  "," << std::endl;
     }
     out << tabulation << ")" << std::endl;
-    
+
 }
 
 void function_call::try_infering_type(parsing::context &ctx) {
@@ -48,22 +48,22 @@ void function_call::emit_code(std::ostream &out, parsing::context &ctx) {
     // We need to transfer params in reverse order
     for(int i = this->args.size() - 1; i >= 0; i --) {
         const auto mem = this->args[i]->memory.get();
-        out << "\t mov rax, " << "[rsp+" << ctx.func_stack_ptr - mem->stack_ptr << "]\n";
+
+		out << "\t push qword " << "[rsp+" << ctx.func_stack_ptr - mem->stack_ptr << "]\n";
 
         const size_t VARIABLE_SIZE = ctx.type_system.all_types[mem->type]->size;
         ctx.func_stack_ptr += VARIABLE_SIZE;
         this->memory->stack_ptr = ctx.func_stack_ptr;
-        out << "\t sub rsp, " << VARIABLE_SIZE << "\n";
-        out << "\t mov [rsp], rax\n"; // Push the value to the stack    
-    }
+	}
     out << "\t call " << this->name << "\n";
-    out << "\t add rsp, " << ctx.current_declaration->args_size << "\n\n";
+
+	out << "\t add rsp, " << this->definition->args_size << "\n\n";
+	ctx.func_stack_ptr -= this->definition->args_size;
 
     const size_t VARIABLE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
 	ctx.func_stack_ptr += VARIABLE_SIZE;
 	this->memory->stack_ptr = ctx.func_stack_ptr;
-    out << "\t sub rsp, " << VARIABLE_SIZE << "\n";
-    out << "\t mov [rsp], rax\n"; // Push the value to the stack    
+	out << "\t push rax\n";
 
     out << std::endl;
 }

@@ -21,7 +21,7 @@ void identifier_literal::try_infering_type(parsing::context &context) {
     if(this->memory->type != typing::NOT_INFERED_ID) { return; }
 
     const auto res = context.get_variable_definition(typing::string_comparator(this->name));
-    assert(res);    
+    assert(res);
 
     this->memory->stack_ptr = res.value()->stack_ptr;
     this->memory->type = res.value()->type;
@@ -34,13 +34,11 @@ void identifier_literal::emit_code(std::ostream &out, parsing::context &ctx) {
 
     out << "\t ; identifier_literal " << this->name << std::endl;
 
-    out << "\t mov rax, " << "[rsp+" << ctx.func_stack_ptr - this->memory->stack_ptr << "]\n";
+    out << "\t push " << " qword [rsp+" << ctx.func_stack_ptr - this->memory->stack_ptr << "]\n";
 
     const size_t VARIABLE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
 	ctx.func_stack_ptr += VARIABLE_SIZE;
 	this->memory->stack_ptr = ctx.func_stack_ptr;
-    out << "\t sub rsp, " << VARIABLE_SIZE << "\n";
-    out << "\t mov [rsp], rax\n"; // Push the value to the stack    
 
     out << std::endl;
 }

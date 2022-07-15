@@ -33,9 +33,7 @@ void number_literal::emit_code(std::ostream &out, parsing::context &ctx) {
 
     out << "\t ; number_literal " << this->value << std::endl;
 
-    out << "\t mov rax, " << this->value << "\n";
-    out << "\t sub rsp, " << INT64_SIZE << "\n";
-    out << "\t mov [rsp], rax\n"; // Push the value to the stack
+    out << "\t push qword " << this->value << "\n";
 
     out << std::endl;
 }

@@ -49,8 +49,7 @@ void binary_expression::emit_code(std::ostream &out, parsing::context &ctx) {
             const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
 			ctx.func_stack_ptr += TYPE_SIZE;
 			this->memory->stack_ptr = ctx.func_stack_ptr;
-            out << "\t sub rsp," << TYPE_SIZE << "\n";
-            out << "\t mov [rsp], rax\n"; // Push the value to the stack
+            out << "\t push rax" << "\n";
 
 			break;
 		}

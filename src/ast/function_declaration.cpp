@@ -34,7 +34,10 @@ void function_declaration::try_infering_type(parsing::context &ctx) {
 }
 
 void function_declaration::emit_code(std::ostream &out, parsing::context &ctx) {
-    out << "\t ; function declaration " << this->name << std::endl;
+	const size_t ADDRESS_SIZE = 8;
+	assert(this->name != "_start" || this->params.size() == 0);
+
+	out << "\t ; function declaration " << this->name << std::endl;
 
 	out << "\t global " << this->name << "\n";
 	out << this->name << ":\n";
@@ -43,22 +46,21 @@ void function_declaration::emit_code(std::ostream &out, parsing::context &ctx) {
     for(const auto &param : this->params) {
         param->emit_code(ctx);
     }
-    this->args_size += 8; // Call pushes a dword into the stack, so ret can work
-    ctx.func_stack_ptr = this->args_size;
+	ctx.func_stack_ptr = this->args_size + ADDRESS_SIZE; // The additional 8 comes from the call instruction using the stack
 
     out << "\t ; end of setup " << this->name << "\n" << std::endl;
 
 	this->body->emit_code(out, ctx);
 
     if(this->name == "_start") {
-        out << "_cleanup_" << this->name << ":\n";
-        out << "\t add rsp, " << ctx.func_stack_ptr << "\n";
+		out << "_cleanup_" << this->name << ":\n";
+        out << "\t add rsp, " << ctx.func_stack_ptr - ADDRESS_SIZE << "\n";
 
 		out << "\t mov rax, 60\n";
 		out << "\t syscall\n";
     } else {
         out << "_cleanup_" << this->name << ":\n";
-        out << "\t add rsp, " << ctx.func_stack_ptr - ctx.current_declaration->args_size << "\n";
+        out << "\t add rsp, " << ctx.func_stack_ptr - this->args_size - ADDRESS_SIZE << "\n";
 
         out << "\t ret\n";
     }

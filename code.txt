@@ -3,5 +3,5 @@ let plus = func(x: i64, y: i64) i64 {
 }
 
 let main = func() i64 {
-	return 15 + plus(10, 20);
+	return 15 + plus(plus(10, 10), 20);
 }
