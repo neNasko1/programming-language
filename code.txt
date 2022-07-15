@@ -4,7 +4,14 @@ let plus = func(x: i64, y: i64) i64 {
 	return 10 + x + y;
 }
 
+let five = func() i64 {
+	return 5;
+}
+
 let main = func() i64 {
+	print(five());
 	print(10);
+	print(15 - plus(10, 20));
+
 	return 15 * 2 - 10 % 3;
 }

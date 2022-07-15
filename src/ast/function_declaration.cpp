@@ -43,6 +43,8 @@ void function_declaration::try_infering_type(parsing::context &ctx) {
 void function_declaration::emit_code(std::ostream &out, parsing::context &ctx) {
 	this->try_infering_type(ctx);
 
+	this->return_size = ctx.type_system.all_types[this->type]->size;
+
     this->args_size = 0;
     for(const auto &param : this->params) {
         param->emit_code(ctx);
@@ -60,7 +62,11 @@ void function_declaration::emit_code(std::ostream &out, parsing::context &ctx) {
 	out << this->name << ":\n";
 
 	const size_t ADDRESS_SIZE = 8;
-	ctx.func_stack_ptr = this->args_size + ADDRESS_SIZE; // The additional 8 comes from the call instruction using the stack
+	ctx.func_stack_ptr += this->return_size;
+	ctx.func_stack_ptr += this->args_size;
+	ctx.func_stack_ptr += ADDRESS_SIZE; // The additional 8 comes from the call instruction using the stack
+
+	const auto initial_func_stack_ptr = ctx.func_stack_ptr;
 
     out << "\t ; end of setup " << this->name << "\n" << std::endl;
 
@@ -74,7 +80,7 @@ void function_declaration::emit_code(std::ostream &out, parsing::context &ctx) {
 		out << "\t syscall\n";
     } else {
         out << "_cleanup_" << this->name << ":\n";
-        out << "\t add rsp, " << ctx.func_stack_ptr - this->args_size - ADDRESS_SIZE << "\n";
+        out << "\t add rsp, " << ctx.func_stack_ptr - initial_func_stack_ptr << "\n";
 
         out << "\t ret\n";
     }

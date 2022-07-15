@@ -25,7 +25,9 @@ void return_statement::emit_code(std::ostream &out, parsing::context &ctx) {
 		out << "\t mov rdi, " << "[rsp+" << ctx.func_stack_ptr - this->value->memory->stack_ptr << "]\n";
         out << "\t jmp _cleanup_" << ctx.current_declaration->name << "\n";
 	} else {
-		out << "\t mov rax, " << "[rsp+" << ctx.func_stack_ptr - this->value->memory->stack_ptr << "]\n";
+		out << "\t mov rax, [rsp+" << ctx.func_stack_ptr - this->value->memory->stack_ptr << "]\n";
+		out << "\t mov [rsp + "
+			<< ctx.func_stack_ptr - ctx.type_system.all_types[ctx.current_declaration->type]->size << "], rax\n";
         out << "\t jmp _cleanup_" << ctx.current_declaration->name << "\n";
     }
 

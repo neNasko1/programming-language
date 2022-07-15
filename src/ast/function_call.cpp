@@ -40,35 +40,29 @@ void function_call::emit_code(std::ostream &out, parsing::context &ctx) {
 
     assert(this->args.size() == this->definition->params.size());
     for(size_t i = 0; i < this->args.size(); i ++) {
-		std::cerr << i << " " << this->args.size() << std::endl;
-		std::cerr << this->definition->params[i]->memory->type << std::endl;
 		this->args[i]->emit_code(out, ctx);
         assert(this->args[i]->memory->type == this->definition->params[i]->memory->type);
     }
+
+	// Alocate space for the return value
+	const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
+	ctx.func_stack_ptr += TYPE_SIZE;
+	this->memory->stack_ptr = ctx.func_stack_ptr;
+	out << "\t sub rsp, " << TYPE_SIZE << "\n";
 
 	// We need to transfer params in reverse order
     for(int i = this->args.size() - 1; i >= 0; i --) {
         const auto mem = this->args[i]->memory.get();
 
 		out << "\t push qword " << "[rsp+" << ctx.func_stack_ptr - mem->stack_ptr << "]\n";
-
-        const size_t VARIABLE_SIZE = ctx.type_system.all_types[mem->type]->size;
-        ctx.func_stack_ptr += VARIABLE_SIZE;
-        this->memory->stack_ptr = ctx.func_stack_ptr;
+		const size_t PARAM_TYPE_SIZE = ctx.type_system.all_types[mem->type]->size;
+		ctx.func_stack_ptr += PARAM_TYPE_SIZE;
 	}
+
     out << "\t call " << this->name << "\n";
 
 	out << "\t add rsp, " << this->definition->args_size << "\n\n";
 	ctx.func_stack_ptr -= this->definition->args_size;
-
-	if(this->memory->type == typing::I64_ID) {
-		const size_t VARIABLE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
-		ctx.func_stack_ptr += VARIABLE_SIZE;
-		this->memory->stack_ptr = ctx.func_stack_ptr;
-		out << "\t push rax\n";
-	} else {
-		assert(this->memory->type == typing::VOID_ID);
-	}
 
     out << std::endl;
 }

@@ -33,7 +33,7 @@ void program::emit_code(std::ostream &out, parsing::context &ctx) {
         ctx.variables.clear();
 
 		decl->emit_code(out, ctx);
-		// TODO: Stack pointer should be cleared up
+		ctx.func_stack_ptr = 0;
 	}
 }
 

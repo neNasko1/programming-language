@@ -16,7 +16,7 @@ $(OBJ_DIR)/%.o: %.cpp
 
 clear:
 	@echo "Removing all compiled files"
-	@rm -r obj asm || :
+	@rm -r obj || :
 	@rm $(EXECUTABLE) || :
 
 run_compiler:
