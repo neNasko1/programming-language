@@ -30,7 +30,7 @@ std::unique_ptr<grammar::expression> parser::parse_function_call() {
     assert(this->match(lexing::token_type::IDENTIFIER));
     assert(this->match(lexing::token_type::L_PAREN));
 
-    std::vector<std::unique_ptr<grammar::expression> > args; 
+    std::vector<std::unique_ptr<grammar::expression> > args;
 
     while(!this->match(lexing::token_type::R_PAREN)) {
         args.push_back(std::move(this->parse_expression()));
@@ -244,6 +244,11 @@ std::unique_ptr<grammar::function_declaration> parser::parse_function_declaratio
 
     const auto type_token = this->advance();
     assert(type_token.type == lexing::token_type::IDENTIFIER);
+
+	// Extern functions have no body
+	if(this->match(lexing::token_type::SEMICOLON)) {
+		return std::make_unique<grammar::function_declaration>(name_token.value, type_token.value, params);
+	}
 
     auto body = this->parse_list_statement();
     assert(this->match(lexing::token_type::SEMICOLON));

@@ -21,7 +21,7 @@ void return_statement::print(std::ostream &out, const size_t ident) const {
 void return_statement::emit_code(std::ostream &out, parsing::context &ctx) {
 	this->value->emit_code(out, ctx);
 
-	if(ctx.current_declaration->name == "_start") {
+	if(ctx.current_declaration->name == "main") {
 		out << "\t mov rdi, " << "[rsp+" << ctx.func_stack_ptr - this->value->memory->stack_ptr << "]\n";
         out << "\t jmp _cleanup_" << ctx.current_declaration->name << "\n";
 	} else {

@@ -53,6 +53,53 @@ void binary_expression::emit_code(std::ostream &out, parsing::context &ctx) {
 
 			break;
 		}
+		case lexing::token_type::MINUS: {
+			out << "\t mov " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
+			out << "\t sub " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
+
+            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
+			ctx.func_stack_ptr += TYPE_SIZE;
+			this->memory->stack_ptr = ctx.func_stack_ptr;
+            out << "\t push rax" << "\n";
+
+			break;
+		}
+		case lexing::token_type::STAR: {
+			out << "\t mov " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
+			out << "\t mov " << " rcx, " << "[rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
+			out << "\t mul " << " rcx\n";
+
+            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
+			ctx.func_stack_ptr += TYPE_SIZE;
+			this->memory->stack_ptr = ctx.func_stack_ptr;
+            out << "\t push rax" << "\n";
+
+			break;
+		}
+		case lexing::token_type::SLASH: {
+			out << "\t mov " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
+			out << "\t mov " << " rcx, " << "[rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
+			out << "\t div " << " rcx\n";
+
+            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
+			ctx.func_stack_ptr += TYPE_SIZE;
+			this->memory->stack_ptr = ctx.func_stack_ptr;
+            out << "\t push rax" << "\n";
+
+			break;
+		}
+		case lexing::token_type::MODULO: {
+			out << "\t mov " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
+			out << "\t mov " << " rcx, " << "[rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
+			out << "\t div " << " rcx\n";
+
+            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
+			ctx.func_stack_ptr += TYPE_SIZE;
+			this->memory->stack_ptr = ctx.func_stack_ptr;
+            out << "\t push rdx" << "\n";
+
+			break;
+		}
 		default: {
 			assert(false);
 		}

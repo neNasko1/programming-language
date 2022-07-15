@@ -16,13 +16,15 @@ $(OBJ_DIR)/%.o: %.cpp
 
 clear:
 	@echo "Removing all compiled files"
-	@rm -r obj || :
+	@rm -r obj asm || :
 	@rm $(EXECUTABLE) || :
 
 run_compiler:
 	@make
 	@./compiler code.txt asm/test.asm && cat asm/test.asm
-	@nasm -f elf64 -g -F dwarf -o asm/test.o asm/test.asm  && ld -o asm/test asm/test.o && ./asm/test && echo "Program exited with code" 0
+	@nasm -f elf64 -g -F dwarf -o asm/lib.o src/lib.asm
+	@nasm -f elf64 -g -F dwarf -o asm/test.o asm/test.asm
+	@gcc -no-pie -o asm/test asm/test.o asm/lib.o && ./asm/test && echo "Program exited with code" 0
 
 recompile:
 	@make rm

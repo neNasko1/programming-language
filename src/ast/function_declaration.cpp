@@ -11,7 +11,11 @@
 namespace grammar {
 
 function_declaration::function_declaration(const std::string_view name, const std::string_view type_hint, std::unique_ptr<statement> body, std::vector<std::unique_ptr<function_declaration_parameter> > &params)
-    : name(name != "main" ? name : "_start"), type_hint(type_hint), body(std::move(body)), type(typing::NOT_INFERED_ID), params(std::move(params)) {
+    : name(name), type_hint(type_hint), body(std::move(body)), type(typing::NOT_INFERED_ID), params(std::move(params)) {
+}
+
+function_declaration::function_declaration(const std::string_view name, const std::string_view type_hint, std::vector<std::unique_ptr<function_declaration_parameter> > &params)
+    : name(name), type_hint(type_hint), body(nullptr), type(typing::NOT_INFERED_ID), params(std::move(params)) {
 }
 
 void function_declaration::print(std::ostream &out, const size_t ident) const {
@@ -21,7 +25,10 @@ void function_declaration::print(std::ostream &out, const size_t ident) const {
     for(const auto &param : this->params) {
         param->print(out, ident + 1);
     }
-    this->body->print(out, ident);
+
+	if(this->body) {
+    	this->body->print(out, ident);
+	}
 }
 
 void function_declaration::try_infering_type(parsing::context &ctx) {
@@ -34,25 +41,32 @@ void function_declaration::try_infering_type(parsing::context &ctx) {
 }
 
 void function_declaration::emit_code(std::ostream &out, parsing::context &ctx) {
-	const size_t ADDRESS_SIZE = 8;
-	assert(this->name != "_start" || this->params.size() == 0);
-
-	out << "\t ; function declaration " << this->name << std::endl;
-
-	out << "\t global " << this->name << "\n";
-	out << this->name << ":\n";
+	this->try_infering_type(ctx);
 
     this->args_size = 0;
     for(const auto &param : this->params) {
         param->emit_code(ctx);
     }
+
+	if(!this->body) {
+		// This is an extern function so skip compiling;
+		out << "\t extern " << this->name << "\n";
+		return;
+	}
+
+	assert(this->name != "main" || this->params.size() == 0);
+	out << "\t ; function declaration " << this->name << std::endl;
+	out << "\t global " << this->name << "\n";
+	out << this->name << ":\n";
+
+	const size_t ADDRESS_SIZE = 8;
 	ctx.func_stack_ptr = this->args_size + ADDRESS_SIZE; // The additional 8 comes from the call instruction using the stack
 
     out << "\t ; end of setup " << this->name << "\n" << std::endl;
 
 	this->body->emit_code(out, ctx);
 
-    if(this->name == "_start") {
+    if(this->name == "main") {
 		out << "_cleanup_" << this->name << ":\n";
         out << "\t add rsp, " << ctx.func_stack_ptr - ADDRESS_SIZE << "\n";
 

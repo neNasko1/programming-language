@@ -1,7 +1,10 @@
+let print = func(x: i64) void
+
 let plus = func(x: i64, y: i64) i64 {
 	return 10 + x + y;
 }
 
 let main = func() i64 {
-	return 15 + plus(plus(10, 10), 20);
+	print(10);
+	return 15 * 2 - 10 % 3;
 }

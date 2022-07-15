@@ -11,7 +11,7 @@ token::~token() {}
 
 std::ostream& operator <<(std::ostream &out, const token &tkn) {
     if(tkn.type == token_type::NEW_LINE) {
-        return out << "\t \\n" << " " << reverse_token_type_names[tkn.type]; 
+        return out << "\t \\n" << " " << reverse_token_type_names[tkn.type];
     } else {
         return out << tkn.value << " " << reverse_token_type_names[tkn.type];
     }
@@ -29,7 +29,7 @@ char lexer::advance() {
 	return this->code[this->pic ++];
 }
 
-bool lexer::match(const char c) {   
+bool lexer::match(const char c) {
     if(this->peek() == c) {
         return this->advance(), true;
     } else {
@@ -54,6 +54,8 @@ token lexer::recognise_special() {
         RETURN_TOKEN(1, token_type::STAR);
     } else if(this->match('/')) {
         RETURN_TOKEN(1, token_type::SLASH);
+    } else if(this->match('%')) {
+        RETURN_TOKEN(1, token_type::MODULO);
     } else if(this->match('=')) {
         RETURN_TOKEN(1, token_type::EQUAL);
     } else if(this->match('(')) {
@@ -133,11 +135,11 @@ bool is_alphabet(const char c) {
 }
 
 bool is_digit(const char c) {
-	return '0' <= c && c <= '9'; 
+	return '0' <= c && c <= '9';
 }
 
 bool is_alphabet_or_digit(const char c) {
-	return is_alphabet(c) || is_digit(c); 
+	return is_alphabet(c) || is_digit(c);
 }
 
 bool is_whitespace(const char c) {
@@ -145,7 +147,7 @@ bool is_whitespace(const char c) {
 }
 
 bool is_special(const char c) {
-    return 
+    return
         c == '+' ||
         c == '-' ||
         c == '*' ||
@@ -183,7 +185,7 @@ token_type get_word_type(const std::string_view word) {
         return token_type::LET;
     } else if(word == "while") {
         return token_type::WHILE;
-    } 
+    }
 
     return token_type::IDENTIFIER;
 }
