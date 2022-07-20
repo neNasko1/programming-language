@@ -21,6 +21,7 @@ clear:
 
 run_compiler:
 	@make
+	@mkdir -p asm
 	@./compiler code.txt asm/test.asm && cat asm/test.asm
 	@nasm -f elf64 -g -F dwarf -o asm/lib.o src/lib.asm
 	@nasm -f elf64 -g -F dwarf -o asm/test.o asm/test.asm

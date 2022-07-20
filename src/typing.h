@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <string_view>
+#include <optional>
 
 namespace typing {
 

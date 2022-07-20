@@ -6,11 +6,13 @@
 
 	global print
 print:
+	mov rbp, rsp ; Used to save the value of rsp because of alignment issues
 	mov rdi, print_i64_string
 	mov rsi, [rsp+8]
 	mov al, 0
-
- 	call printf
+	and rsp, -16
+	call printf
+	mov rsp, rbp ; Fix rsp value
 
 	mov rdi, [rel stdout]
 	call fflush

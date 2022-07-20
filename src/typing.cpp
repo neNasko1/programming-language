@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <string_view>
 #include <iostream>
+#include <optional>
 
 #include "typing.h"
 
