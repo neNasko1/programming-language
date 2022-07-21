@@ -190,6 +190,15 @@ std::unique_ptr<grammar::return_statement> parser::parse_return_statement() {
     return std::make_unique<grammar::return_statement>(std::move(expr));
 }
 
+std::unique_ptr<grammar::if_statement> parser::parse_if_statement() {
+    assert(this->match(lexing::token_type::IF));
+
+    auto cond = this->parse_expression();
+	auto body = this->parse_list_statement();
+
+    return std::make_unique<grammar::if_statement>(std::move(cond), std::move(body));
+}
+
 std::unique_ptr<grammar::list_statement> parser::parse_list_statement() {
     assert(this->match(lexing::token_type::L_BRACE));
 
@@ -200,12 +209,15 @@ std::unique_ptr<grammar::list_statement> parser::parse_list_statement() {
             body.push_back(this->parse_let_statement());
         } else if(this->peek().type == lexing::token_type::RETURN) {
             body.push_back(this->parse_return_statement());
+        } else if(this->peek().type == lexing::token_type::IF) {
+            body.push_back(this->parse_if_statement());
         } else {
             body.push_back(this->parse_expression_statement());
         }
-    }
+	}
 
     assert(this->match(lexing::token_type::R_BRACE));
+    assert(this->match(lexing::token_type::SEMICOLON));
     return std::make_unique<grammar::list_statement>(body);
 }
 
@@ -251,7 +263,6 @@ std::unique_ptr<grammar::function_declaration> parser::parse_function_declaratio
 	}
 
     auto body = this->parse_list_statement();
-    assert(this->match(lexing::token_type::SEMICOLON));
 
     return std::make_unique<grammar::function_declaration>(name_token.value, type_token.value, std::move(body), params);
 }

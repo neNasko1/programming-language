@@ -72,6 +72,8 @@ namespace character {
 bool is_alphabet(const char c);
 bool is_digit(const char c);
 bool is_alphabet_or_digit(const char c);
+bool is_name_start(const char c);
+bool is_name_continuation(const char c);
 bool is_whitespace(const char c);
 bool is_special(const char c);
 

@@ -85,9 +85,9 @@ token lexer::recognise_special() {
 
 void lexer::lex() {
 	while(!this->is_at_end()) {
-		if(utils::character::is_alphabet(this->peek())) {
+		if(utils::character::is_name_start(this->peek())) {
 			const size_t start = this->pic;
-			while(!this->is_at_end() && utils::character::is_alphabet_or_digit(this->peek())) {
+			while(!this->is_at_end() && utils::character::is_name_continuation(this->peek())) {
 				this->advance();
 			}
 			const size_t end   = this->pic - 1;
@@ -140,6 +140,14 @@ bool is_digit(const char c) {
 
 bool is_alphabet_or_digit(const char c) {
 	return is_alphabet(c) || is_digit(c);
+}
+
+bool is_name_start(const char c) {
+	return is_alphabet(c) || c == '_';
+}
+
+bool is_name_continuation(const char c) {
+	return is_name_start(c) || is_digit(c);
 }
 
 bool is_whitespace(const char c) {

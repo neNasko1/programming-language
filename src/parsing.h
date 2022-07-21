@@ -37,6 +37,7 @@ struct parser {
     std::unique_ptr<grammar::list_statement> parse_list_statement();
     std::unique_ptr<grammar::let_statement> parse_let_statement();
     std::unique_ptr<grammar::return_statement> parse_return_statement();
+    std::unique_ptr<grammar::if_statement> parse_if_statement();
     std::unique_ptr<grammar::function_declaration_parameter> parse_function_declaration_parameter();
     std::unique_ptr<grammar::function_declaration> parse_function_declaration();
     std::unique_ptr<grammar::global_declaration> parse_definition();

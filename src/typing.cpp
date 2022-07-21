@@ -37,6 +37,7 @@ type_system::type_system() {
     assert(this->add_or_get_type(std::make_shared<simple_type>("void", 0)).second == VOID_ID);
     assert(this->add_or_get_type(std::make_shared<simple_type>("i32", 4)).second == I32_ID);
     assert(this->add_or_get_type(std::make_shared<simple_type>("i64", 8)).second == I64_ID);
+    assert(this->add_or_get_type(std::make_shared<simple_type>("bool", 1)).second == BOOL_ID);
 
     this->add_or_get_type(std::make_shared<simple_type>("i8" , 1));
     this->add_or_get_type(std::make_shared<simple_type>("i16", 2));

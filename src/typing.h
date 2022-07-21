@@ -13,6 +13,7 @@ const size_t NOT_INFERED_ID = 0;
 const size_t VOID_ID = 1;
 const size_t I32_ID = 2;
 const size_t I64_ID = 3;
+const size_t BOOL_ID = 4;
 
 // TODO: Add hashing for fast type lookup
 struct string_comparator {

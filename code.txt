@@ -1,4 +1,6 @@
 let print = func(x: i64) void
+let i64_to_bool = func(x: i64) bool
+let is_zero = func(x: i64) bool
 
 let plus = func(x: i64, y: i64) i64 {
 	return 10 + x + y;
@@ -8,10 +10,18 @@ let five = func() i64 {
 	return 5;
 }
 
-let main = func() i64 {
-	print(five());
-	print(10);
-	print(15 - plus(10, 20));
+let fib = func(x: i64) i64 {
+	if is_zero(x) {
+		return 1;
+	}
+	if is_zero(x - 1) {
+		return 1;
+	}
+	return fib(x - 1) + 1;
+}
 
-	return 15 * 2 - 10 % 3;
+let main = func() i64 {
+	print(fib(0));
+
+	return 0;
 }

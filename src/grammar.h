@@ -16,6 +16,7 @@ struct identifier_literal;
 struct binary_expression;
 struct function_call;
 
+struct if_statement;
 struct expression_statement;
 struct list_statement;
 struct let_statement;
@@ -86,6 +87,7 @@ struct global_declaration : public ast_node {
 #include "ast/binary_expression.h"
 #include "ast/function_call.h"
 
+#include "ast/if_statement.h"
 #include "ast/expression_statement.h"
 #include "ast/list_statement.h"
 #include "ast/let_statement.h"
