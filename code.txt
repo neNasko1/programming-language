@@ -2,26 +2,16 @@ let print = func(x: i64) void
 let i64_to_bool = func(x: i64) bool
 let is_zero = func(x: i64) bool
 
-let plus = func(x: i64, y: i64) i64 {
-	return 10 + x + y;
-}
-
-let five = func() i64 {
-	return 5;
-}
-
-let fib = func(x: i64) i64 {
-	if is_zero(x) {
-		return 1;
+let sum = func (x: i64) i64 {
+	if(is_zero(x)) {
+		return 0;
 	}
-	if is_zero(x - 1) {
-		return 1;
-	}
-	return fib(x - 1) + 1;
+
+	return 1 + sum(x - 1);
 }
 
 let main = func() i64 {
-	print(fib(0));
+	print(sum(1));
 
 	return 0;
 }

@@ -67,21 +67,19 @@ void function_declaration::emit_code(std::ostream &out, parsing::context &ctx) {
 	ctx.func_stack_ptr += ADDRESS_SIZE; // The additional 8 comes from the call instruction using the stack
 
 	const auto initial_func_stack_ptr = ctx.func_stack_ptr;
+	out << "\t mov rbp, rsp\n";
 
     out << "\t ; end of setup " << this->name << "\n" << std::endl;
 
 	this->body->emit_code(out, ctx);
 
-    if(this->name == "main") {
-		out << "_cleanup_" << this->name << ":\n";
-        out << "\t add rsp, " << ctx.func_stack_ptr - ADDRESS_SIZE << "\n";
+	out << "_cleanup_" << this->name << ":\n";
+	out << "\t mov rsp, rbp\n";
 
+    if(this->name == "main") {
 		out << "\t mov rax, 60\n";
 		out << "\t syscall\n";
     } else {
-        out << "_cleanup_" << this->name << ":\n";
-        out << "\t add rsp, " << ctx.func_stack_ptr - initial_func_stack_ptr << "\n";
-
         out << "\t ret\n";
     }
 

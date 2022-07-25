@@ -45,8 +45,8 @@ i64_to_bool_true:
 is_zero:
 	mov rax, [rsp+8]
 	cmp rax, 0
-	je is_zero_false
-	jmp is_zero_true
+	je is_zero_true
+	jmp is_zero_false
 
 is_zero_false:
 	mov al, 0

@@ -21,18 +21,15 @@ void if_statement::print(std::ostream &out, const size_t ident) const {
 }
 
 void if_statement::emit_code(std::ostream &out, parsing::context &ctx) {
-	assert(false);
-
 	this->cond->emit_code(out, ctx);
 	assert(this->cond->memory->type == typing::BOOL_ID);
 
 	out << "\t mov al, " << "[rsp+" << ctx.func_stack_ptr - this->cond->memory->stack_ptr << "]\n";
 	out << "\t cmp al, 0\n";
 
-	// Random cheat for inserting accurate labels
+	// TODO: Random cheat for inserting distinct labels
 	const std::string name = "if_label_not" + std::to_string((uint64_t)this);
-	out << "\t jne " << name << "\n";
-	const size_t before_func_stack_ptr = ctx.func_stack_ptr;
+	out << "\t je " << name << "\n";
 	this->body->emit_code(out, ctx);
 	out << name << ":\n";
 }

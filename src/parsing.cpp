@@ -168,10 +168,10 @@ std::unique_ptr<grammar::let_statement> parser::parse_let_statement() {
 
     std::string_view type = "";
 
-    if(this->match(lexing::token_type::SEMICOLON)) {
-        const auto type_token = this->advance();
+    if(this->match(lexing::token_type::COLON)) {
+		const auto type_token = this->advance();
         assert(type_token.type == lexing::token_type::IDENTIFIER);
-        type = type_token.value;
+		type = type_token.value;
     }
 
     assert(this->match(lexing::token_type::EQUAL));

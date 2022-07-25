@@ -27,7 +27,7 @@ void let_statement::print(std::ostream &out, const size_t ident) const {
 
 void let_statement::emit_code(std::ostream &out, parsing::context &ctx) {
     this->init_value->emit_code(out, ctx);
-    assert(this->init_value->memory->type == typing::I64_ID);
+	assert(this->init_value->memory->type == typing::I64_ID);
 
     assert(this->init_value->memory->type == ctx.type_system.find_type(typing::string_comparator(this->type_hint)));
 
@@ -36,7 +36,7 @@ void let_statement::emit_code(std::ostream &out, parsing::context &ctx) {
 
     assert(ctx.variables.find(this->name) == ctx.variables.end()); // Assert this is the first declaration of the variable
 
-    out << "\t push " << "[rsp+" << ctx.func_stack_ptr - this->init_value->memory->stack_ptr << "]\n";
+    out << "\t push qword " << "[rsp+" << ctx.func_stack_ptr - this->init_value->memory->stack_ptr << "]\n";
 
     const size_t VARIABLE_SIZE = ctx.type_system.all_types[this->init_value->memory->type]->size;
 	ctx.func_stack_ptr += VARIABLE_SIZE;
