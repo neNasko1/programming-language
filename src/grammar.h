@@ -39,7 +39,6 @@ struct program;
 
 namespace grammar {
 
-// TODO: Make constant
 struct memory_cell {
     size_t stack_ptr; // Location of the value
     size_t type;

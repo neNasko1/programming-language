@@ -10,12 +10,14 @@ print:
 	mov rsi, [rsp+8]
 	mov al, 0
 
+	push rbp
 	mov rbp, rsp ; Used to save the value of rsp because of alignment issues
 	and rsp, -16
 
 	call printf
 
 	mov rsp, rbp ; Fix rsp value
+	pop rbp
 
 	mov rdi, [rel stdout]
 	call fflush
@@ -47,7 +49,6 @@ is_zero:
 	cmp rax, 0
 	je is_zero_true
 	jmp is_zero_false
-
 is_zero_false:
 	mov al, 0
 	mov [rsp+16], al

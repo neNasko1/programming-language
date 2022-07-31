@@ -23,9 +23,13 @@ run_compiler:
 	@make
 	@mkdir -p asm
 	@./compiler code.txt asm/test.asm && cat asm/test.asm
+	@make compile_asm
+	@./asm/test && echo "Program exited with code" 0
+
+compile_asm:
 	@nasm -f elf64 -g -o asm/lib.o src/lib.asm
 	@nasm -f elf64 -g -o asm/test.o asm/test.asm
-	@gcc -g -no-pie -o asm/test asm/test.o asm/lib.o && ./asm/test && echo "Program exited with code" 0
+	@gcc -g -no-pie -o asm/test asm/test.o asm/lib.o
 
 recompile:
 	@make rm
