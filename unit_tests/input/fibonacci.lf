@@ -1,0 +1,30 @@
+let print = func(x: i64) void
+let i64_to_bool = func(x: i64) bool
+let is_zero = func(x: i64) bool
+
+let sum_rec = func(x: i64) i64 {
+	if(is_zero(x)) {
+		return 0;
+	}
+
+	return 1 + sum_rec(x - 1);
+}
+
+let fib = func(x: i64) i64 {
+	if(is_zero(x)) {
+		return 1;
+	}
+	if(is_zero(x - 1)) {
+		return 1;
+	}
+	return fib(x - 1) + fib(x - 2);
+}
+
+let main = func() i64 {
+	print(sum_rec(2));
+	print(fib(8));
+	print(fib(9));
+	print(fib(10));
+
+	return 0;
+}
