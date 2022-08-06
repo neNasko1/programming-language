@@ -20,11 +20,19 @@ let fib = func(x: i64) i64 {
 	return fib(x - 1) + fib(x - 2);
 }
 
+let fib_fast = func(a: i64, b: i64, n: i64) i64 {
+	if(is_zero(n)) {
+		return a;
+	}
+
+	return fib_fast(b, a + b, n - 1);
+}
+
 let main = func() i64 {
 	print(sum_rec(2));
 	print(fib(8));
 	print(fib(9));
-	print(fib(10));
+	print(fib_fast(0, 1, 40));
 
 	return 0;
 }

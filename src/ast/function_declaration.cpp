@@ -46,8 +46,8 @@ void function_declaration::emit_code(std::ostream &out, parsing::context &ctx) {
 	this->return_size = ctx.type_system.all_types[this->type]->size;
 
     this->args_size = 0;
-    for(const auto &param : this->params) {
-        param->emit_code(ctx);
+	for(int i = this->params.size() - 1; i >= 0; i --) {
+        this->params[i]->emit_code(ctx);
     }
 
 	if(!this->body) {
