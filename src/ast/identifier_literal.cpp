@@ -29,18 +29,6 @@ void identifier_literal::try_infering_type(parsing::context &context) {
 
 void identifier_literal::emit_code(std::ostream &out, parsing::context &ctx) {
     this->try_infering_type(ctx);
-
-    assert(this->memory->type == typing::I64_ID);
-
-    out << "\t ; identifier_literal " << this->name << std::endl;
-
-    out << "\t push " << " qword [rsp+" << ctx.func_stack_ptr - this->memory->stack_ptr << "]\n";
-
-    const size_t VARIABLE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
-	ctx.func_stack_ptr += VARIABLE_SIZE;
-	this->memory->stack_ptr = ctx.func_stack_ptr;
-
-    out << std::endl;
 }
 
 };

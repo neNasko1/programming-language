@@ -5,6 +5,7 @@
 #include "../grammar.h"
 #include "../lexing.h"
 #include "../parsing.h"
+#include "../asm_helper.h"
 #include "function_call.h"
 
 namespace grammar {
@@ -54,8 +55,8 @@ void function_call::emit_code(std::ostream &out, parsing::context &ctx) {
     for(int i = this->args.size() - 1; i >= 0; i --) {
         const auto mem = this->args[i]->memory.get();
 
-		out << "\t push qword " << "[rsp+" << ctx.func_stack_ptr - mem->stack_ptr << "]\n";
 		const size_t PARAM_TYPE_SIZE = ctx.type_system.all_types[mem->type]->size;
+		asm_helper::push_to_stack(out, ctx.func_stack_ptr - mem->stack_ptr, PARAM_TYPE_SIZE);
 		ctx.func_stack_ptr += PARAM_TYPE_SIZE;
 	}
 

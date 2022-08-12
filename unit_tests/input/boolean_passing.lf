@@ -1,0 +1,24 @@
+let print = func(x: i64) void
+let i64_to_bool = func(x: i64) bool
+let is_zero = func(x: i64) bool
+
+let iterate = func(a: i64, b: bool) i64 {
+	if(is_zero(a)) {
+		return 0;
+	}
+
+	if(b) {
+		print(a);
+
+		iterate(a - 1, is_zero(1));
+		return 0;
+	}
+
+	iterate(a - 1, is_zero(0));
+	return 0;
+}
+
+let main = func() i64 {
+	iterate(10, is_zero(0));
+	return 0;
+}

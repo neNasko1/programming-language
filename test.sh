@@ -20,10 +20,15 @@ do
 	curr_out=$(mktemp)
 	$executable > $curr_out
 
-	if cmp -s $curr_out $out; then
-		printf "\033[0;32m$in\n"
+	if test -f $out; then
+		if cmp -s $curr_out $out; then
+			printf "\033[0;32m$in\n"
+		else
+			printf "\033[0;31m$in\n"
+		fi
 	else
-		printf "\033[0;31m$in\n"
+		cp $curr_out $out
+		printf "\033[0;33m$in\n"
 	fi
 
 	rm $curr_out
