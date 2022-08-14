@@ -31,7 +31,11 @@ compile_asm:
 	@nasm -f elf64 -g -o asm/test.o asm/test.asm
 	@gcc -g -no-pie -o asm/test asm/test.o asm/lib.o
 
+test_compiler:
+	@./test.sh
+
 recompile:
-	@make rm
-	@make test
+	@make clear
+	@make
+	@make test_compiler
 

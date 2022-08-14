@@ -2,37 +2,23 @@ let print = func(x: i64) void
 let i64_to_bool = func(x: i64) bool
 let is_zero = func(x: i64) bool
 
-let sum_rec = func(x: i64) i64 {
-	if(is_zero(x)) {
+let iterate = func(a: i64, b: bool) i64 {
+	if(is_zero(a)) {
 		return 0;
 	}
 
-	return 1 + sum_rec(x - 1);
-}
+	if(b) {
+		print(a);
 
-let fib = func(x: i64) i64 {
-	if(is_zero(x)) {
-		return 1;
-	}
-	if(is_zero(x - 1)) {
-		return 1;
-	}
-	return fib(x - 1) + fib(x - 2);
-}
-
-let fib_fast = func(a: i64, b: i64, n: i64) i64 {
-	if(is_zero(n)) {
-		return a;
+		iterate(a - 1, is_zero(1));
+		return 0;
 	}
 
-	return fib_fast(b, a + b, n - 1);
+	iterate(a - 1, is_zero(0));
+	return 0;
 }
 
 let main = func() i64 {
-	print(sum_rec(2));
-	print(fib(8));
-	print(fib(9));
-	print(fib_fast(0, 1, 40));
-
+	iterate(10, is_zero(0));
 	return 0;
 }
