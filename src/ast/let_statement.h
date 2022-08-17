@@ -12,17 +12,16 @@ namespace grammar {
 
 struct let_statement : public statement {
     const std::string name;
-    const std::string type_hint;
+    const std::unique_ptr<type_call> type;
     const std::unique_ptr<expression> init_value;
 
     std::unique_ptr<memory_cell> memory;
 
-    let_statement(const std::string &name, std::unique_ptr<expression> init_value);
-    let_statement(const std::string &name, const std::string &type_hint, std::unique_ptr<expression> init_value);
+    let_statement(const std::string &name, std::unique_ptr<type_call> &type, std::unique_ptr<expression> init_value);
     ~let_statement() = default;
 
     void print(std::ostream &out, const size_t identation) const;
-	void emit_code(std::ostream &out, parsing::context &ctx);
+	void compile(std::ostream &out, parsing::context &ctx);
 };
 
 };

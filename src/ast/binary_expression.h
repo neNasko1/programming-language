@@ -20,7 +20,7 @@ struct binary_expression : public expression {
 
     void print(std::ostream &out, const size_t identation) const;
     void try_infering_type(parsing::context &context);
-	void emit_code(std::ostream &out, parsing::context &ctx);
+	void compile(std::ostream &out, parsing::context &ctx);
 };
 
 };

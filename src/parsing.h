@@ -31,6 +31,7 @@ struct parser {
     bool match(const lexing::token_type type);
     bool is_at_end() const;
 
+    std::unique_ptr<grammar::type_call> parse_type_call();
     std::unique_ptr<grammar::expression> parse_expression();
     std::unique_ptr<grammar::expression> parse_function_call();
     std::unique_ptr<grammar::expression_statement> parse_expression_statement();

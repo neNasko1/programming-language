@@ -56,6 +56,8 @@ token lexer::recognise_special() {
         RETURN_TOKEN(1, token_type::SLASH);
     } else if(this->match('%')) {
         RETURN_TOKEN(1, token_type::MODULO);
+    } else if(this->match('&')) {
+        RETURN_TOKEN(1, token_type::AND);
     } else if(this->match('=')) {
         RETURN_TOKEN(1, token_type::EQUAL);
     } else if(this->match('(')) {
@@ -161,6 +163,7 @@ bool is_special(const char c) {
         c == '*' ||
         c == '/' ||
         c == '%' ||
+        c == '&' ||
         c == '=' ||
         c == '(' ||
         c == ')' ||

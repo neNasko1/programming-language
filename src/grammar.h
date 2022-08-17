@@ -9,6 +9,7 @@ namespace grammar {
 struct memory_cell;
 
 struct ast_node;
+struct type_call;
 struct expression;
 struct statement;
 struct number_literal;
@@ -61,14 +62,14 @@ struct expression : public ast_node {
     virtual ~expression() = default;
 
     virtual void try_infering_type(parsing::context &context) = 0;
-	virtual void emit_code(std::ostream &out, parsing::context &ctx) = 0;
+	virtual void compile(std::ostream &out, parsing::context &ctx) = 0;
 };
 
 struct statement : public ast_node {
     statement() = default;
     virtual ~statement() = default;
 
-	virtual void emit_code(std::ostream &out, parsing::context &ctx) = 0;
+	virtual void compile(std::ostream &out, parsing::context &ctx) = 0;
 };
 
 struct global_declaration : public ast_node {
@@ -76,7 +77,7 @@ struct global_declaration : public ast_node {
     virtual ~global_declaration() = default;
 
     virtual void print(std::ostream &out, const size_t identation) const = 0;
-	virtual void emit_code(std::ostream &out, parsing::context &ctx) = 0;
+	virtual void compile(std::ostream &out, parsing::context &ctx) = 0;
 };
 
 };
@@ -86,6 +87,7 @@ struct global_declaration : public ast_node {
 #include "ast/binary_expression.h"
 #include "ast/function_call.h"
 
+#include "ast/type_call.h"
 #include "ast/if_statement.h"
 #include "ast/expression_statement.h"
 #include "ast/list_statement.h"

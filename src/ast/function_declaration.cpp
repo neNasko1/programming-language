@@ -19,7 +19,7 @@ function_declaration::function_declaration(const std::string &name, const std::s
 }
 
 void function_declaration::print(std::ostream &out, const size_t ident) const {
-    std::string tabulation = std::string(ident, '\t');
+    const std::string tabulation = std::string(ident, '\t');
 
     out << tabulation << "function " << this->name << " : " << this->type_hint << std::endl;
     for(const auto &param : this->params) {
@@ -40,14 +40,14 @@ void function_declaration::try_infering_type(parsing::context &ctx) {
     this->type = res.value();
 }
 
-void function_declaration::emit_code(std::ostream &out, parsing::context &ctx) {
+void function_declaration::compile(std::ostream &out, parsing::context &ctx) {
 	this->try_infering_type(ctx);
 
 	this->return_size = ctx.type_system.all_types[this->type]->size;
 
     this->args_size = 0;
 	for(int i = this->params.size() - 1; i >= 0; i --) {
-        this->params[i]->emit_code(ctx);
+        this->params[i]->compile(ctx);
     }
 
 	if(!this->body) {
@@ -72,7 +72,7 @@ void function_declaration::emit_code(std::ostream &out, parsing::context &ctx) {
 
     out << "\t ; end of setup " << this->name << "\n" << std::endl;
 
-	this->body->emit_code(out, ctx);
+	this->body->compile(out, ctx);
 
 	out << "_cleanup_" << this->name << ":\n";
 	out << "\t mov rsp, rbp\n";

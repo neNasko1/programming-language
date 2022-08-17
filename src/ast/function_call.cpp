@@ -13,9 +13,9 @@ namespace grammar {
 function_call::function_call(const std::string &name, std::vector<std::unique_ptr<expression> > args) : name(name), args(std::move(args)) {}
 
 void function_call::print(std::ostream &out, const size_t ident) const {
-    std::string tabulation = std::string(ident, '\t');
+    const std::string tabulation = std::string(ident, '\t');
 
-    out << tabulation << "function call" << this->name << " (" << std::endl;
+    out << tabulation << "function call " << this->name << " (" << std::endl;
     for(const auto &arg : this->args) {
         arg->print(out, ident + 1);
         out << tabulation <<  "," << std::endl;
@@ -34,14 +34,14 @@ void function_call::try_infering_type(parsing::context &ctx) {
 	this->memory->type = this->definition->type;
 }
 
-void function_call::emit_code(std::ostream &out, parsing::context &ctx) {
+void function_call::compile(std::ostream &out, parsing::context &ctx) {
     this->try_infering_type(ctx);
 
     out << "\t ; function call " << this->name << "\n";
 
     assert(this->args.size() == this->definition->params.size());
     for(size_t i = 0; i < this->args.size(); i ++) {
-		this->args[i]->emit_code(out, ctx);
+		this->args[i]->compile(out, ctx);
         assert(this->args[i]->memory->type == this->definition->params[i]->memory->type);
     }
 

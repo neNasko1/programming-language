@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 	std::ofstream output_code(argv[2]);
 	parsing::context ctx;
     std::cout << "GENERATING CODE..." << std::endl;
-	program->emit_code(output_code, ctx);
+	program->compile(output_code, ctx);
 	output_code.close();
 
 	return 0;

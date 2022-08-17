@@ -10,19 +10,20 @@
 
 namespace grammar {
 
-function_declaration_parameter::function_declaration_parameter(const std::string &name, const std::string &type_hint)
-    : name(name), type_hint(type_hint), type(typing::NOT_INFERED_ID) {
+function_declaration_parameter::function_declaration_parameter(const std::string &name, std::unique_ptr<type_call> &type)
+    : name(name), type(std::move(type)) {
 }
 
 void function_declaration_parameter::print(std::ostream &out, const size_t ident) const {
-    std::string tabulation = std::string(ident, '\t');
+    const std::string tabulation = std::string(ident, '\t');
 
-    out << tabulation << this->name << " : " << this->type_hint << std::endl;
+    out << tabulation << this->name << " : " << this->type->internal_name << std::endl;
 }
 
-void function_declaration_parameter::emit_code(parsing::context &ctx) {
-    if(this->type != typing::NOT_INFERED_ID) { return; }
+void function_declaration_parameter::compile(parsing::context &ctx) {
+    assert(false);
 
+/*
     const auto res = ctx.type_system.find_type(this->type_hint);
     assert(res);
 
@@ -31,6 +32,7 @@ void function_declaration_parameter::emit_code(parsing::context &ctx) {
 	ctx.current_declaration->args_size += ctx.type_system.all_types[this->type]->size;
     this->memory = std::make_unique<memory_cell>(ctx.current_declaration->return_size + ctx.current_declaration->args_size, this->type);
     ctx.declare_variable(this->name, this->memory.get());
+*/
 }
 
 };
