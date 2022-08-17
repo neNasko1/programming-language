@@ -12,7 +12,7 @@ namespace grammar {
 identifier_literal::identifier_literal(const std::string &name) : name(name) {}
 
 void identifier_literal::print(std::ostream &out, const size_t ident) const {
-    std::string tabulation = std::string(ident, '\t');
+    const std::string tabulation = std::string(ident, '\t');
 
     out << tabulation << "identifier(" << this->name << ")" << std::endl;
 }
@@ -27,7 +27,7 @@ void identifier_literal::try_infering_type(parsing::context &context) {
     this->memory->type = res.value()->type;
 }
 
-void identifier_literal::emit_code(std::ostream &out, parsing::context &ctx) {
+void identifier_literal::compile(std::ostream &out, parsing::context &ctx) {
     this->try_infering_type(ctx);
 }
 

@@ -12,7 +12,7 @@ namespace grammar {
 number_literal::number_literal(const std::string &value) : value(value) {}
 
 void number_literal::print(std::ostream &out, const size_t ident) const {
-    std::string tabulation = std::string(ident, '\t');
+    const std::string tabulation = std::string(ident, '\t');
 
     out << tabulation << "number(" << this->value << ")" << std::endl;
 }
@@ -23,7 +23,7 @@ void number_literal::try_infering_type(parsing::context &context) {
     this->memory->type = typing::I64_ID;
 }
 
-void number_literal::emit_code(std::ostream &out, parsing::context &ctx) {
+void number_literal::compile(std::ostream &out, parsing::context &ctx) {
 	this->try_infering_type(ctx);
 	assert(this->memory->type != typing::NOT_INFERED_ID);
 

@@ -1,5 +1,5 @@
-nasm -f elf64 -g -o asm/lib.o src/lib.asm
-make compiler
+lib_asm=$(mktemp)
+nasm -f elf64 -g -o $lib_asm src/lib.asm
 
 for src in unit_tests/input/**
 do
@@ -13,7 +13,7 @@ do
 	trash=$(mktemp)
 	./compiler $src $code_asm > trash
 	nasm -f elf64 -g -o $code_o $code_asm
-	gcc -g -no-pie -o $executable $code_o asm/lib.o
+	gcc -g -no-pie -o $executable $code_o $lib_asm
 	rm $code_asm
 	rm $code_o
 
@@ -33,3 +33,6 @@ do
 
 	rm $curr_out
 done
+
+rm $lib_asm
+printf "\033[0;37m"

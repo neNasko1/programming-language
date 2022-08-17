@@ -15,12 +15,12 @@ function_declaration_parameter::function_declaration_parameter(const std::string
 }
 
 void function_declaration_parameter::print(std::ostream &out, const size_t ident) const {
-    std::string tabulation = std::string(ident, '\t');
+    const std::string tabulation = std::string(ident, '\t');
 
     out << tabulation << this->name << " : " << this->type_hint << std::endl;
 }
 
-void function_declaration_parameter::emit_code(parsing::context &ctx) {
+void function_declaration_parameter::compile(parsing::context &ctx) {
     if(this->type != typing::NOT_INFERED_ID) { return; }
 
     const auto res = ctx.type_system.find_type(this->type_hint);

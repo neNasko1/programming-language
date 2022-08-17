@@ -12,7 +12,7 @@ namespace grammar {
 if_statement::if_statement(std::unique_ptr<expression> cond, std::unique_ptr<statement> body) : cond(std::move(cond)), body(std::move(body)) {};
 
 void if_statement::print(std::ostream &out, const size_t ident) const {
-    std::string tabulation = std::string(ident, '\t');
+    const std::string tabulation = std::string(ident, '\t');
 
     out << tabulation << "if statement (" << std::endl;
     this->cond->print(out, ident + 1);
@@ -20,8 +20,8 @@ void if_statement::print(std::ostream &out, const size_t ident) const {
 	this->body->print(out, ident + 1);
 }
 
-void if_statement::emit_code(std::ostream &out, parsing::context &ctx) {
-	this->cond->emit_code(out, ctx);
+void if_statement::compile(std::ostream &out, parsing::context &ctx) {
+	this->cond->compile(out, ctx);
 	assert(this->cond->memory->type == typing::BOOL_ID);
 
 	out << "\t mov al, " << "[rsp+" << ctx.func_stack_ptr - this->cond->memory->stack_ptr << "]\n";
@@ -30,7 +30,7 @@ void if_statement::emit_code(std::ostream &out, parsing::context &ctx) {
 	// TODO: Random cheat for inserting distinct labels
 	const std::string name = "if_label_not" + std::to_string((uint64_t)this);
 	out << "\t je " << name << "\n";
-	this->body->emit_code(out, ctx);
+	this->body->compile(out, ctx);
 	out << name << ":\n";
 }
 

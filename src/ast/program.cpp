@@ -12,7 +12,7 @@ namespace grammar {
 program::program(std::vector<std::unique_ptr<function_declaration> > &function_declarations) : function_declarations(std::move(function_declarations)) {}
 
 void program::print(std::ostream &out, const size_t ident) const {
-    std::string tabulation = std::string(ident, '\t');
+    const std::string tabulation = std::string(ident, '\t');
 
     out << tabulation << "program(" << std::endl;
     for(const auto &it : this->function_declarations) {
@@ -21,7 +21,7 @@ void program::print(std::ostream &out, const size_t ident) const {
     out << tabulation << ")" << std::endl;
 }
 
-void program::emit_code(std::ostream &out, parsing::context &ctx) {
+void program::compile(std::ostream &out, parsing::context &ctx) {
 	out << "\t section .text\n";
     for(const auto &decl : this->function_declarations) {
         ctx.declare_function(decl->name, decl.get());
@@ -32,7 +32,7 @@ void program::emit_code(std::ostream &out, parsing::context &ctx) {
 		ctx.current_declaration = decl.get();
         ctx.variables.clear();
 
-		decl->emit_code(out, ctx);
+		decl->compile(out, ctx);
 		ctx.func_stack_ptr = 0;
 	}
 }

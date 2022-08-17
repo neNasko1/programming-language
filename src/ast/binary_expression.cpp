@@ -13,7 +13,7 @@ binary_expression::binary_expression(std::unique_ptr<expression> lft, const lexi
     : lft(std::move(lft)), op(op), rght(std::move(rght)) {}
 
 void binary_expression::print(std::ostream &out, const size_t ident) const {
-    std::string tabulation = std::string(ident, '\t');
+    const std::string tabulation = std::string(ident, '\t');
 
     out << tabulation << "binary_expression(" << std::endl;
     this->lft->print(out, ident + 1);
@@ -30,14 +30,14 @@ void binary_expression::try_infering_type(parsing::context &context) {
 	this->memory->type = this->lft->memory->type;
 }
 
-void binary_expression::emit_code(std::ostream &out, parsing::context &ctx) {
+void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 	this->try_infering_type(ctx);
 	assert(this->memory->type != typing::NOT_INFERED_ID);
 
 	assert(this->memory->type == typing::I64_ID); // TODO: Handle different types of expressions
 
-	this->lft->emit_code(out, ctx);
-	this->rght->emit_code(out, ctx);
+	this->lft->compile(out, ctx);
+	this->rght->compile(out, ctx);
 
 	out << "\t ; binary_expression " << lexing::reverse_token_type_names[this->op.type] << std::endl;
 

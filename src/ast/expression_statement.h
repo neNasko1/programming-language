@@ -17,7 +17,7 @@ struct expression_statement : public statement {
     ~expression_statement() = default;
 
     void print(std::ostream &out, const size_t identation) const;
-	void emit_code(std::ostream &out, parsing::context &ctx);
+	void compile(std::ostream &out, parsing::context &ctx);
 };
 
 };
