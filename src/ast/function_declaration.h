@@ -11,8 +11,8 @@
 namespace grammar {
 
 struct function_declaration : public global_declaration {
-    const std::string_view name;
-    const std::string_view type_hint;
+    const std::string name;
+    const std::string type_hint;
     const std::unique_ptr<statement> body;
     const std::vector<std::unique_ptr<function_declaration_parameter> > params;
 
@@ -20,8 +20,8 @@ struct function_declaration : public global_declaration {
     size_t return_size;
     size_t args_size;
 
-    function_declaration(const std::string_view name, const std::string_view type_hint, std::unique_ptr<statement> body, std::vector<std::unique_ptr<function_declaration_parameter> > &params);
-    function_declaration(const std::string_view name, const std::string_view type_hint, std::vector<std::unique_ptr<function_declaration_parameter> > &params);
+    function_declaration(const std::string &name, const std::string &type_hint, std::unique_ptr<statement> body, std::vector<std::unique_ptr<function_declaration_parameter> > &params);
+    function_declaration(const std::string &name, const std::string &type_hint, std::vector<std::unique_ptr<function_declaration_parameter> > &params);
     ~function_declaration() = default;
 
     void print(std::ostream &out, const size_t identation) const;

@@ -11,9 +11,9 @@
 namespace grammar {
 
 struct number_literal : public expression {
-    const std::string_view value;
+    const std::string value;
 
-    number_literal(const std::string_view value);
+    number_literal(const std::string &value);
     ~number_literal() = default;
 
     void print(std::ostream &out, const size_t identation) const;

@@ -10,7 +10,7 @@
 
 namespace grammar {
 
-function_call::function_call(const std::string_view name, std::vector<std::unique_ptr<expression> > args) : name(name), args(std::move(args)) {}
+function_call::function_call(const std::string &name, std::vector<std::unique_ptr<expression> > args) : name(name), args(std::move(args)) {}
 
 void function_call::print(std::ostream &out, const size_t ident) const {
     std::string tabulation = std::string(ident, '\t');
@@ -27,7 +27,7 @@ void function_call::print(std::ostream &out, const size_t ident) const {
 void function_call::try_infering_type(parsing::context &ctx) {
     if(this->memory->type != typing::NOT_INFERED_ID) { return; }
 
-    const auto res = ctx.get_function_definition(typing::string_comparator(this->name));
+    const auto res = ctx.get_function_definition(this->name);
     assert(res);
 
     this->definition = res.value();

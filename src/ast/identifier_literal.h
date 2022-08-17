@@ -11,9 +11,9 @@
 namespace grammar {
 
 struct identifier_literal : public expression {
-    const std::string_view name;
+    const std::string name;
 
-    identifier_literal(const std::string_view name);
+    identifier_literal(const std::string &name);
     ~identifier_literal() = default;
 
     void print(std::ostream &out, const size_t identation) const;

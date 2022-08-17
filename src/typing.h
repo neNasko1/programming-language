@@ -15,48 +15,23 @@ const size_t I32_ID = 2;
 const size_t I64_ID = 3;
 const size_t BOOL_ID = 4;
 
-// TODO: Add hashing for fast type lookup
-struct string_comparator {
-    const std::string value;
+struct simple_type {
+	const std::string name;
+	const size_t size;
 
-    string_comparator(const std::string &value);
-    string_comparator(const std::string_view &value);
-    ~string_comparator() = default;
-
-    bool operator <(const string_comparator &other) const;
-};
-
-struct type {
-	size_t size;
-
-    type(const size_t size);
-    virtual ~type() = default;
-
-    virtual const string_comparator &get_comp() const = 0;
-	virtual size_t get_size() const = 0;
-};
-
-struct simple_type : public type {
-    const std::string name;
-    const string_comparator comp;
-
-    simple_type(const char *name, const size_t size);
     simple_type(const std::string &name, const size_t size);
-    ~simple_type() = default;
-
-    const string_comparator &get_comp() const;
-	size_t get_size() const;
+    virtual ~simple_type() = default;
 };
 
 struct type_system {
-    std::vector<std::shared_ptr<type> > all_types;
-    std::map<string_comparator, size_t> type_map;
+    std::vector<std::shared_ptr<simple_type> > all_types;
+    std::map<std::string, size_t> type_map;
 
     type_system();
     ~type_system() = default;
 
-    std::pair<bool, size_t> add_or_get_type(const std::shared_ptr<type> &type);
-    std::optional<size_t> find_type(const string_comparator &comp) const;
+    std::pair<bool, size_t> add_or_get_type(const std::shared_ptr<simple_type> &type);
+    std::optional<size_t> find_type(const std::string &name) const;
 };
 
 };

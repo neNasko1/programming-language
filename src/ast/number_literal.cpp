@@ -9,7 +9,7 @@
 
 namespace grammar {
 
-number_literal::number_literal(const std::string_view value) : value(value) {}
+number_literal::number_literal(const std::string &value) : value(value) {}
 
 void number_literal::print(std::ostream &out, const size_t ident) const {
     std::string tabulation = std::string(ident, '\t');

@@ -26,7 +26,7 @@ bool parser::is_at_end() const {
 }
 
 std::unique_ptr<grammar::expression> parser::parse_function_call() {
-    const std::string_view name = this->peek().value;
+    const auto name = this->peek().value;
     assert(this->match(lexing::token_type::IDENTIFIER));
     assert(this->match(lexing::token_type::L_PAREN));
 
@@ -166,7 +166,7 @@ std::unique_ptr<grammar::let_statement> parser::parse_let_statement() {
     const auto name_token = this->advance();
     assert(name_token.type == lexing::token_type::IDENTIFIER);
 
-    std::string_view type = "";
+    std::string type = "";
 
     if(this->match(lexing::token_type::COLON)) {
 		const auto type_token = this->advance();
@@ -287,11 +287,11 @@ std::unique_ptr<grammar::program> parser::parse_program() {
     return std::make_unique<grammar::program>(function_declarations);
 }
 
-void context::declare_variable(const typing::string_comparator &comp, const grammar::memory_cell* definition) {
+void context::declare_variable(const std::string &comp, const grammar::memory_cell* definition) {
 	this->variables[comp] = definition;
 }
 
-std::optional<const grammar::memory_cell*> context::get_variable_definition(const typing::string_comparator &comp) const {
+std::optional<const grammar::memory_cell*> context::get_variable_definition(const std::string &comp) const {
     const auto res = this->variables.find(comp);
 
     if(res == this->variables.end()) {
@@ -301,11 +301,11 @@ std::optional<const grammar::memory_cell*> context::get_variable_definition(cons
     }
 }
 
-void context::declare_function(const typing::string_comparator &comp, const grammar::function_declaration* definition) {
+void context::declare_function(const std::string &comp, const grammar::function_declaration* definition) {
 	this->functions[comp] = definition;
 }
 
-std::optional<const grammar::function_declaration*> context::get_function_definition(const typing::string_comparator &comp) const {
+std::optional<const grammar::function_declaration*> context::get_function_definition(const std::string &comp) const {
     const auto res = this->functions.find(comp);
 
     if(res == this->functions.end()) {

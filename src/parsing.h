@@ -46,8 +46,8 @@ struct parser {
 
 struct context {
     typing::type_system type_system;
-    std::map<typing::string_comparator, const grammar::memory_cell*> variables;
-    std::map<typing::string_comparator, const grammar::function_declaration*> functions;
+    std::map<std::string, const grammar::memory_cell*> variables;
+    std::map<std::string, const grammar::function_declaration*> functions;
 
 	size_t func_stack_ptr = 0;
 	grammar::function_declaration* current_declaration;
@@ -55,11 +55,11 @@ struct context {
     context() = default;
     ~context() = default;
 
-    void declare_variable(const typing::string_comparator &comp, const grammar::memory_cell* definition);
-    std::optional<const grammar::memory_cell*> get_variable_definition(const typing::string_comparator &comp) const;
+    void declare_variable(const std::string &comp, const grammar::memory_cell* definition);
+    std::optional<const grammar::memory_cell*> get_variable_definition(const std::string &comp) const;
 
-    void declare_function(const typing::string_comparator &comp, const grammar::function_declaration* definition);
-    std::optional<const grammar::function_declaration*> get_function_definition(const typing::string_comparator &comp) const;
+    void declare_function(const std::string &comp, const grammar::function_declaration* definition);
+    std::optional<const grammar::function_declaration*> get_function_definition(const std::string &comp) const;
 };
 
 };

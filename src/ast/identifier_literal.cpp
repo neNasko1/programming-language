@@ -9,7 +9,7 @@
 
 namespace grammar {
 
-identifier_literal::identifier_literal(const std::string_view name) : name(name) {}
+identifier_literal::identifier_literal(const std::string &name) : name(name) {}
 
 void identifier_literal::print(std::ostream &out, const size_t ident) const {
     std::string tabulation = std::string(ident, '\t');
@@ -20,7 +20,7 @@ void identifier_literal::print(std::ostream &out, const size_t ident) const {
 void identifier_literal::try_infering_type(parsing::context &context) {
     if(this->memory->type != typing::NOT_INFERED_ID) { return; }
 
-    const auto res = context.get_variable_definition(typing::string_comparator(this->name));
+    const auto res = context.get_variable_definition(std::string(this->name));
     assert(res);
 
     this->memory->stack_ptr = res.value()->stack_ptr;

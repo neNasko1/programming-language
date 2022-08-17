@@ -10,7 +10,7 @@
 
 namespace grammar {
 
-function_declaration_parameter::function_declaration_parameter(const std::string_view name, const std::string_view type_hint)
+function_declaration_parameter::function_declaration_parameter(const std::string &name, const std::string &type_hint)
     : name(name), type_hint(type_hint), type(typing::NOT_INFERED_ID) {
 }
 
@@ -23,7 +23,7 @@ void function_declaration_parameter::print(std::ostream &out, const size_t ident
 void function_declaration_parameter::emit_code(parsing::context &ctx) {
     if(this->type != typing::NOT_INFERED_ID) { return; }
 
-    const auto res = ctx.type_system.find_type(typing::string_comparator(this->type_hint));
+    const auto res = ctx.type_system.find_type(this->type_hint);
     assert(res);
 
     this->type = res.value();

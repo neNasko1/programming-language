@@ -10,11 +10,11 @@
 
 namespace grammar {
 
-function_declaration::function_declaration(const std::string_view name, const std::string_view type_hint, std::unique_ptr<statement> body, std::vector<std::unique_ptr<function_declaration_parameter> > &params)
+function_declaration::function_declaration(const std::string &name, const std::string &type_hint, std::unique_ptr<statement> body, std::vector<std::unique_ptr<function_declaration_parameter> > &params)
     : name(name), type_hint(type_hint), body(std::move(body)), type(typing::NOT_INFERED_ID), params(std::move(params)) {
 }
 
-function_declaration::function_declaration(const std::string_view name, const std::string_view type_hint, std::vector<std::unique_ptr<function_declaration_parameter> > &params)
+function_declaration::function_declaration(const std::string &name, const std::string &type_hint, std::vector<std::unique_ptr<function_declaration_parameter> > &params)
     : name(name), type_hint(type_hint), body(nullptr), type(typing::NOT_INFERED_ID), params(std::move(params)) {
 }
 
@@ -34,7 +34,7 @@ void function_declaration::print(std::ostream &out, const size_t ident) const {
 void function_declaration::try_infering_type(parsing::context &ctx) {
     if(this->type != typing::NOT_INFERED_ID) { return; }
 
-    const auto res = ctx.type_system.find_type(typing::string_comparator(this->type_hint));
+    const auto res = ctx.type_system.find_type(this->type_hint);
     assert(res);
 
     this->type = res.value();

@@ -6,7 +6,7 @@
 
 namespace lexing {
 
-token::token(const std::string_view value, const token_type type) : value(value), type(type) {}
+token::token(const std::string &value, const token_type type) : value(value), type(type) {}
 token::~token() {}
 
 std::ostream& operator <<(std::ostream &out, const token &tkn) {
@@ -44,7 +44,7 @@ bool lexer::is_at_end() const {
 token lexer::recognise_special() {
     assert(!this->is_at_end());
 
-    #define RETURN_TOKEN(length, type) return token(std::string_view(this->code).substr(this->pic - length, 1), type);
+    #define RETURN_TOKEN(length, type) return token(this->code.substr(this->pic - length, 1), type);
 
     if(this->match('+')) {
         RETURN_TOKEN(1, token_type::PLUS);
@@ -92,7 +92,7 @@ void lexer::lex() {
 			}
 			const size_t end   = this->pic - 1;
 
-            const std::string_view value = std::string_view(this->code).substr(start, end - start + 1);
+            const auto value = this->code.substr(start, end - start + 1);
             const token_type type = utils::word::get_word_type(value);
 			this->tokens.push_back(token(value, type));
 
@@ -113,7 +113,7 @@ void lexer::lex() {
 			}
 			const size_t end   = this->pic - 1;
 
-            const std::string_view value = std::string_view(this->code).substr(start, end - start + 1);
+            const auto value = this->code.substr(start, end - start + 1);
             const token_type type = token_type::NUMBER;
 			this->tokens.push_back(token(value, type));
 
@@ -178,7 +178,7 @@ bool is_special(const char c) {
 namespace word {
 
 // TODO: SLOW -> use a trie
-token_type get_word_type(const std::string_view word) {
+token_type get_word_type(const std::string &word) {
     if(word == "else") {
         return token_type::ELSE;
     } else if(word == "func") {

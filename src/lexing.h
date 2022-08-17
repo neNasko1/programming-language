@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 namespace lexing {
 
@@ -40,10 +41,10 @@ const std::string reverse_token_type_names[token_type::TOKEN_TYPE_SIZE] = {
 
 
 struct token {
-	std::string_view value;
+	std::string value;
 	token_type type;
 
-	token(const std::string_view value, const token_type type);
+	token(const std::string &value, const token_type type);
 	~token();
 };
 
@@ -81,7 +82,7 @@ bool is_special(const char c);
 
 namespace word {
 
-token_type get_word_type(const std::string_view word);
+token_type get_word_type(const std::string &word);
 
 };
 
