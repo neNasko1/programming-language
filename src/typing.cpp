@@ -11,30 +11,37 @@
 
 namespace typing {
 
-simple_type::simple_type(const std::string &name, const size_t size) : name(name), size(size) {}
+simple_type::simple_type(const std::string &name, const size_t size, const type_system *parent_system) : name(name), size(size), parent_system(parent_system) {}
+
+reference_type::reference_type(const std::string &ref_name, const size_t ref_to, const type_system *parent_system) : simple_type(ref_name + "&", 8, parent_system), ref_to(ref_to) {}
 
 // Assume that indexing is correct, TODO: learn how to use c++
 type_system::type_system() {
     // Adding this types should always result in ids 0, 1 ...
-    assert(this->add_or_get_type(std::make_shared<simple_type>("not_infered", 0)).second == NOT_INFERED_ID);
-    assert(this->add_or_get_type(std::make_shared<simple_type>("void", 0)).second == VOID_ID);
-    assert(this->add_or_get_type(std::make_shared<simple_type>("i32", 4)).second == I32_ID);
-    assert(this->add_or_get_type(std::make_shared<simple_type>("i64", 8)).second == I64_ID);
-    assert(this->add_or_get_type(std::make_shared<simple_type>("bool", 1)).second == BOOL_ID);
+    assert(this->add_simple_type("not_infered", 0).second == NOT_INFERED_ID);
+    assert(this->add_simple_type("void", 0).second == VOID_ID);
+    assert(this->add_simple_type("i32", 4).second == I32_ID);
+    assert(this->add_simple_type("i64", 8).second == I64_ID);
+    assert(this->add_simple_type("bool", 1).second == BOOL_ID);
 
-    this->add_or_get_type(std::make_shared<simple_type>("i8", 1));
-    this->add_or_get_type(std::make_shared<simple_type>("i16", 2));
+    this->add_simple_type("i8", 1);
+    this->add_simple_type("i16", 2);
 }
 
-std::pair<bool, size_t> type_system::add_or_get_type(const std::shared_ptr<simple_type> &type) {
-    const auto res = this->type_map.find(type->name);
+std::pair<bool, size_t> type_system::add_simple_type(const std::string &name, const size_t size) {
+    const auto res = this->type_map.find(name);
+
     if(res != this->type_map.end()) {
         return {false, res->second};
     } else {
-        this->all_types.push_back(type);
-        this->type_map[type->name] = this->all_types.size() - 1;
+        const size_t ind = this->all_types.size();
+        this->all_types.push_back(std::make_unique<simple_type>(name, size, this));
+        this->type_map[name] = ind;
 
-        return {true, this->all_types.size() - 1};
+        this->all_types.push_back(std::make_shared<reference_type>(name, ind, this));
+        this->type_map[this->all_types.back()->name] = ind;
+
+        return {true, ind};
     }
 
     assert(false);

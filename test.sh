@@ -1,5 +1,4 @@
 nasm -f elf64 -g -o asm/lib.o src/lib.asm
-make compiler
 
 for src in unit_tests/input/**
 do

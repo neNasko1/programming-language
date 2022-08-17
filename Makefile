@@ -36,6 +36,6 @@ test_compiler:
 
 recompile:
 	@make clear
-	@make
+	@g++ $(SRC_FILES) $(CPPFLAGS) $(CXXFLAGS) -o $(EXECUTABLE)
 	@make test_compiler
 
