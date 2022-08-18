@@ -1,0 +1,24 @@
+let print = func(x: i64) void
+let i64_to_bool = func(x: i64) bool
+let is_zero = func(x: i64) bool
+
+let fc = func(a: i64&, b: i64) void {
+	print(a + b);
+}
+
+let expression_test = func(a: i64, b: i64&) i64 {
+	return (a * b + b - b) / b;
+}
+
+let main = func() i64 {
+	let a = 3;
+	print(a * 10);
+
+	print(10 * 3);
+
+	fc(a, 10);
+	print(expression_test(10, a) % 3);
+	print(expression_test(10, a) * 30 - 10 + 4);
+
+	return 0;
+}

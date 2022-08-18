@@ -22,9 +22,19 @@ void if_statement::print(std::ostream &out, const size_t ident) const {
 
 void if_statement::compile(std::ostream &out, parsing::context &ctx) {
 	this->cond->compile(out, ctx);
-	assert(this->cond->memory->type_ind == typing::BOOL_ID);
+	const auto cond_ref = ctx.type_system.unwrap_ref(this->cond->memory->type_ind);
 
-	out << "\t mov al, " << "[rsp+" << ctx.func_stack_ptr - this->cond->memory->stack_ptr << "]\n";
+	assert(cond_ref.first == typing::BOOL_ID);
+
+	if(cond_ref.second) {
+		out << "\t lea rcx, [rsp+" << ctx.func_stack_ptr - this->cond->memory->stack_ptr << "]\n";
+		for(size_t i = 0; i < cond_ref.second; i ++) {
+			out << "\t mov rcx, [rcx]\n";
+		}
+		out << "\t mov al, [rcx]\n";
+	} else {
+		out << "\t mov al, " << "[rsp+" << ctx.func_stack_ptr - this->cond->memory->stack_ptr << "]\n";
+	}
 	out << "\t cmp al, 0\n";
 
 	// TODO: Random cheat for inserting distinct labels

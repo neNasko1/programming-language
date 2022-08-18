@@ -6,6 +6,7 @@
 #include <string_view>
 #include <iostream>
 #include <optional>
+#include <utility>
 
 #include "typing.h"
 
@@ -14,6 +15,23 @@ namespace typing {
 simple_type::simple_type(const std::string &name, const size_t size, const type_system *parent_system) : name(name), size(size), parent_system(parent_system) {}
 
 reference_type::reference_type(const std::string &ref_name, const size_t ref_to, const type_system *parent_system) : simple_type(ref_name, 8, parent_system), ref_to(ref_to) {}
+
+std::pair<size_t, size_t> type_system::unwrap_ref(size_t type_ind) {
+	size_t depth = 0;
+
+	while(true) {
+		const auto ref = dynamic_cast<typing::reference_type*>(this->all_types[type_ind].get());
+
+		if(ref == nullptr) {
+			return {type_ind, depth};
+		} else {
+			depth ++;
+			type_ind = ref->ref_to;
+		}
+	}
+
+	assert(false);
+}
 
 // Assume that indexing is correct, TODO: learn how to use c++
 type_system::type_system() {

@@ -42,7 +42,14 @@ void function_call::compile(std::ostream &out, parsing::context &ctx) {
     assert(this->args.size() == this->definition->params.size());
     for(size_t i = 0; i < this->args.size(); i ++) {
 		this->args[i]->compile(out, ctx);
-        assert(this->args[i]->memory->type_ind == this->definition->params[i]->memory->type_ind);
+
+        const auto mem = this->args[i]->memory.get();
+		const auto arg_tid = mem->type_ind;
+		const auto arg_uref = ctx.type_system.unwrap_ref(arg_tid);
+
+		const auto req_arg_tid = this->definition->params[i]->memory->type_ind;
+		const auto req_arg_uref = ctx.type_system.unwrap_ref(req_arg_tid);
+		assert(arg_uref.first == req_arg_uref.first && arg_uref.second >= req_arg_uref.second);
     }
 
 	// Alocate space for the return value
@@ -54,9 +61,26 @@ void function_call::compile(std::ostream &out, parsing::context &ctx) {
 	// We need to transfer params in reverse order
     for(int i = this->args.size() - 1; i >= 0; i --) {
         const auto mem = this->args[i]->memory.get();
+		const auto arg_tid = mem->type_ind;
+		const auto arg_uref = ctx.type_system.unwrap_ref(arg_tid);
 
-		const size_t PARAM_TYPE_SIZE = ctx.type_system.all_types[mem->type_ind]->size;
-		asm_helper::push_to_stack(out, ctx.func_stack_ptr - mem->stack_ptr, PARAM_TYPE_SIZE);
+		const auto req_arg_tid = this->definition->params[i]->memory->type_ind;
+		const auto req_arg_uref = ctx.type_system.unwrap_ref(req_arg_tid);
+
+		const auto move_up_cnt = arg_uref.second - req_arg_uref.second;
+
+		if(move_up_cnt) {
+			out << "\t lea rcx, [rsp+" << ctx.func_stack_ptr - this->args[i]->memory->stack_ptr << "]\n";
+			for(size_t i = 0; i < move_up_cnt - 1; i ++) {
+				out << "\t mov rcx, [rcx]\n";
+			}
+			out << "\t mov rax, [rcx]\n";
+		} else {
+			out << "\t lea rax, [rsp+" << ctx.func_stack_ptr - this->args[i]->memory->stack_ptr << "]\n";
+		}
+
+		const size_t PARAM_TYPE_SIZE = ctx.type_system.all_types[arg_uref.first]->size;
+		asm_helper::push_to_stack_str(out, std::string("rax"), PARAM_TYPE_SIZE);
 		ctx.func_stack_ptr += PARAM_TYPE_SIZE;
 	}
 

@@ -47,7 +47,7 @@ void type_call::compile(std::ostream &out, parsing::context &ctx) {
 		assert(this->args.size() == 1);
 		const auto ref_to = this->args[0]->type_ind;
         const auto now = std::make_shared<typing::reference_type>(this->internal_name, ref_to, &(ctx.type_system));
-    	ctx.type_system.add_type(now);
+    	this->type_ind = ctx.type_system.add_type(now).second;
 	} else {
         assert(this->args.size() == 0);
         assert("Type doesn't exist" && false);

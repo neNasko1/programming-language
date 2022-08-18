@@ -43,6 +43,7 @@ struct type_system {
 
     std::pair<bool, size_t> add_type(const std::shared_ptr<simple_type> &new_type);
     std::optional<size_t> find_type(const std::string &name) const;
+	std::pair<size_t, size_t> unwrap_ref(size_t type_ind);
 };
 
 };
