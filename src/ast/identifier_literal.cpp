@@ -18,13 +18,13 @@ void identifier_literal::print(std::ostream &out, const size_t ident) const {
 }
 
 void identifier_literal::try_infering_type(parsing::context &context) {
-    if(this->memory->type != typing::NOT_INFERED_ID) { return; }
+    if(this->memory->type_ind != typing::NOT_INFERED_ID) { return; }
 
     const auto res = context.get_variable_definition(std::string(this->name));
     assert(res);
 
     this->memory->stack_ptr = res.value()->stack_ptr;
-    this->memory->type = res.value()->type;
+    this->memory->type_ind = res.value()->type_ind;
 }
 
 void identifier_literal::compile(std::ostream &out, parsing::context &ctx) {

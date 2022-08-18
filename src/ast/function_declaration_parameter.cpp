@@ -20,19 +20,14 @@ void function_declaration_parameter::print(std::ostream &out, const size_t ident
     out << tabulation << this->name << " : " << this->type->internal_name << std::endl;
 }
 
-void function_declaration_parameter::compile(parsing::context &ctx) {
-    assert(false);
+void function_declaration_parameter::compile(std::ostream &out, parsing::context &ctx) {
+	this->type->compile(out, ctx);
 
-/*
-    const auto res = ctx.type_system.find_type(this->type_hint);
-    assert(res);
+	const auto type_ind = this->type->type_ind;
 
-    this->type = res.value();
-
-	ctx.current_declaration->args_size += ctx.type_system.all_types[this->type]->size;
-    this->memory = std::make_unique<memory_cell>(ctx.current_declaration->return_size + ctx.current_declaration->args_size, this->type);
+	ctx.current_declaration->args_size += ctx.type_system.all_types[type_ind]->size;
+    this->memory = std::make_unique<memory_cell>(ctx.current_declaration->return_size + ctx.current_declaration->args_size, type_ind);
     ctx.declare_variable(this->name, this->memory.get());
-*/
 }
 
 };

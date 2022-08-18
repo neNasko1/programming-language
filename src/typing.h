@@ -10,18 +10,18 @@
 namespace typing {
 
 const size_t NOT_INFERED_ID = 0;
-const size_t VOID_ID = 2;
-const size_t I32_ID = 4;
-const size_t I64_ID = 6;
-const size_t BOOL_ID = 8;
+const size_t VOID_ID = 1;
+const size_t I32_ID = 2;
+const size_t I64_ID = 3;
+const size_t BOOL_ID = 4;
 
 struct type_system;
 
 struct simple_type {
-	const type_system *parent_system;
-
     const std::string name;
 	const size_t size;
+
+	const type_system *parent_system;
 
     simple_type(const std::string &name, const size_t size, const type_system *parent_system = nullptr);
     virtual ~simple_type() = default;
@@ -41,7 +41,7 @@ struct type_system {
     type_system();
     ~type_system() = default;
 
-    std::pair<bool, size_t> add_simple_type(const std::string &name, const size_t size);
+    std::pair<bool, size_t> add_type(const std::shared_ptr<simple_type> &new_type);
     std::optional<size_t> find_type(const std::string &name) const;
 };
 

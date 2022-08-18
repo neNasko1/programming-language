@@ -38,10 +38,14 @@ std::unique_ptr<grammar::type_call> parser::parse_type_call() {
             name = "&";
         }
     } else {
-        name = "auto";
+        name = "";
     }
 
-    return std::make_unique<grammar::type_call>(name, args);
+	if(name.size() == 0) {
+		return nullptr;
+	} else {
+    	return std::make_unique<grammar::type_call>(name, args);
+	}
 }
 
 std::unique_ptr<grammar::expression> parser::parse_function_call() {
@@ -190,7 +194,7 @@ std::unique_ptr<grammar::let_statement> parser::parse_let_statement() {
     if(this->match(lexing::token_type::COLON)) {
         type = std::move(this->parse_type_call());
     } else {
-        type = std::make_unique<grammar::type_call>("auto");
+        type = nullptr;
     }
 
     assert(this->match(lexing::token_type::EQUAL));

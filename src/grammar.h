@@ -42,9 +42,9 @@ namespace grammar {
 
 struct memory_cell {
     size_t stack_ptr; // Location of the value
-    size_t type;
+    size_t type_ind;
 
-    memory_cell(const size_t stack_ptr, const size_t type) : stack_ptr(stack_ptr), type(type) {}
+    memory_cell(const size_t stack_ptr, const size_t type_ind) : stack_ptr(stack_ptr), type_ind(type_ind) {}
     ~memory_cell() = default;
 };
 

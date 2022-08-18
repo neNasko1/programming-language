@@ -22,7 +22,7 @@ void if_statement::print(std::ostream &out, const size_t ident) const {
 
 void if_statement::compile(std::ostream &out, parsing::context &ctx) {
 	this->cond->compile(out, ctx);
-	assert(this->cond->memory->type == typing::BOOL_ID);
+	assert(this->cond->memory->type_ind == typing::BOOL_ID);
 
 	out << "\t mov al, " << "[rsp+" << ctx.func_stack_ptr - this->cond->memory->stack_ptr << "]\n";
 	out << "\t cmp al, 0\n";

@@ -20,7 +20,7 @@ struct function_declaration_parameter : public ast_node {
     ~function_declaration_parameter() = default;
 
     void print(std::ostream &out, const size_t identation) const;
-    void compile(parsing::context &context);
+    void compile(std::ostream &out, parsing::context &ctx);
 };
 
 };

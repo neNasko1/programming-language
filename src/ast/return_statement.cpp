@@ -27,7 +27,7 @@ void return_statement::compile(std::ostream &out, parsing::context &ctx) {
 	} else {
 		out << "\t mov rax, [rsp+" << ctx.func_stack_ptr - this->value->memory->stack_ptr << "]\n";
 		out << "\t mov [rsp + "
-			<< ctx.func_stack_ptr - ctx.type_system.all_types[ctx.current_declaration->type]->size << "], rax\n";
+			<< ctx.func_stack_ptr - ctx.type_system.all_types[ctx.current_declaration->type_ind]->size << "], rax\n";
         out << "\t jmp _cleanup_" << ctx.current_declaration->name << "\n";
     }
 

@@ -26,15 +26,15 @@ void binary_expression::try_infering_type(parsing::context &context) {
 	this->lft->try_infering_type(context);
 	this->rght->try_infering_type(context);
 
-	assert(this->lft->memory->type == this->rght->memory->type);
-	this->memory->type = this->lft->memory->type;
+	assert(this->lft->memory->type_ind == this->rght->memory->type_ind);
+	this->memory->type_ind = this->lft->memory->type_ind;
 }
 
 void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 	this->try_infering_type(ctx);
-	assert(this->memory->type != typing::NOT_INFERED_ID);
+	assert(this->memory->type_ind != typing::NOT_INFERED_ID);
 
-	assert(this->memory->type == typing::I64_ID); // TODO: Handle different types of expressions
+	assert(this->memory->type_ind == typing::I64_ID); // TODO: Handle different types of expressions
 
 	this->lft->compile(out, ctx);
 	this->rght->compile(out, ctx);
@@ -46,7 +46,7 @@ void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 			out << "\t mov " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
 			out << "\t add " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
 
-            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
+            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type_ind]->size;
 			ctx.func_stack_ptr += TYPE_SIZE;
 			this->memory->stack_ptr = ctx.func_stack_ptr;
             out << "\t push rax" << "\n";
@@ -57,7 +57,7 @@ void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 			out << "\t mov " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
 			out << "\t sub " << " rax, " << "[rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
 
-            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
+            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type_ind]->size;
 			ctx.func_stack_ptr += TYPE_SIZE;
 			this->memory->stack_ptr = ctx.func_stack_ptr;
             out << "\t push rax" << "\n";
@@ -69,7 +69,7 @@ void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 			out << "\t mov " << " rcx, " << "[rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
 			out << "\t mul " << " rcx\n";
 
-            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
+            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type_ind]->size;
 			ctx.func_stack_ptr += TYPE_SIZE;
 			this->memory->stack_ptr = ctx.func_stack_ptr;
             out << "\t push rax" << "\n";
@@ -81,7 +81,7 @@ void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 			out << "\t mov " << " rcx, " << "[rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
 			out << "\t div " << " rcx\n";
 
-            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
+            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type_ind]->size;
 			ctx.func_stack_ptr += TYPE_SIZE;
 			this->memory->stack_ptr = ctx.func_stack_ptr;
             out << "\t push rax" << "\n";
@@ -93,7 +93,7 @@ void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 			out << "\t mov " << " rcx, " << "[rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
 			out << "\t div " << " rcx\n";
 
-            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type]->size;
+            const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type_ind]->size;
 			ctx.func_stack_ptr += TYPE_SIZE;
 			this->memory->stack_ptr = ctx.func_stack_ptr;
             out << "\t push rdx" << "\n";

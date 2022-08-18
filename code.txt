@@ -2,7 +2,7 @@ let print = func(x: i64) void
 let i64_to_bool = func(x: i64) bool
 let is_zero = func(x: i64) bool
 
-let fc = func(a: i64&, b: i64) void {
+let fc = func(a: i64, b: i64) void {
 	print(a + b);
 }
 

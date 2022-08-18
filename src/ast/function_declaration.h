@@ -16,7 +16,7 @@ struct function_declaration : public global_declaration {
     const std::unique_ptr<statement> body;
     const std::vector<std::unique_ptr<function_declaration_parameter> > params;
 
-    size_t type;
+    size_t type_ind;
     size_t return_size;
     size_t args_size;
 

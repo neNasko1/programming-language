@@ -14,6 +14,7 @@ struct type_call : public ast_node {
     std::vector<std::unique_ptr<type_call> > args;
 
     std::string internal_name;
+    size_t type_ind;
 
     type_call(const std::string &name);
     type_call(const std::string &name, std::vector<std::unique_ptr<type_call> > &args);

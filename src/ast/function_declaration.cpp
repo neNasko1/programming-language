@@ -11,11 +11,11 @@
 namespace grammar {
 
 function_declaration::function_declaration(const std::string &name, const std::string &type_hint, std::unique_ptr<statement> body, std::vector<std::unique_ptr<function_declaration_parameter> > &params)
-    : name(name), type_hint(type_hint), body(std::move(body)), type(typing::NOT_INFERED_ID), params(std::move(params)) {
+    : name(name), type_hint(type_hint), body(std::move(body)), type_ind(typing::NOT_INFERED_ID), params(std::move(params)) {
 }
 
 function_declaration::function_declaration(const std::string &name, const std::string &type_hint, std::vector<std::unique_ptr<function_declaration_parameter> > &params)
-    : name(name), type_hint(type_hint), body(nullptr), type(typing::NOT_INFERED_ID), params(std::move(params)) {
+    : name(name), type_hint(type_hint), body(nullptr), type_ind(typing::NOT_INFERED_ID), params(std::move(params)) {
 }
 
 void function_declaration::print(std::ostream &out, const size_t ident) const {
@@ -32,22 +32,22 @@ void function_declaration::print(std::ostream &out, const size_t ident) const {
 }
 
 void function_declaration::try_infering_type(parsing::context &ctx) {
-    if(this->type != typing::NOT_INFERED_ID) { return; }
+    if(this->type_ind != typing::NOT_INFERED_ID) { return; }
 
     const auto res = ctx.type_system.find_type(this->type_hint);
     assert(res);
 
-    this->type = res.value();
+    this->type_ind = res.value();
 }
 
 void function_declaration::compile(std::ostream &out, parsing::context &ctx) {
 	this->try_infering_type(ctx);
 
-	this->return_size = ctx.type_system.all_types[this->type]->size;
+	this->return_size = ctx.type_system.all_types[this->type_ind]->size;
 
     this->args_size = 0;
 	for(int i = this->params.size() - 1; i >= 0; i --) {
-        this->params[i]->compile(ctx);
+        this->params[i]->compile(out, ctx);
     }
 
 	if(!this->body) {
