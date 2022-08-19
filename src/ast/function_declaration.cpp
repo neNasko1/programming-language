@@ -10,18 +10,22 @@
 
 namespace grammar {
 
-function_declaration::function_declaration(const std::string &name, const std::string &type_hint, std::unique_ptr<statement> body, std::vector<std::unique_ptr<function_declaration_parameter> > &params)
-    : name(name), type_hint(type_hint), body(std::move(body)), type_ind(typing::NOT_INFERED_ID), params(std::move(params)) {
+function_declaration::function_declaration(const std::string &name, std::unique_ptr<type_call> &type, std::unique_ptr<list_statement> &body, std::vector<std::unique_ptr<function_declaration_parameter> > &params)
+    : name(name), type(std::move(type)), body(std::move(body)), type_ind(typing::NOT_INFERED_ID), params(std::move(params)) {
 }
 
-function_declaration::function_declaration(const std::string &name, const std::string &type_hint, std::vector<std::unique_ptr<function_declaration_parameter> > &params)
-    : name(name), type_hint(type_hint), body(nullptr), type_ind(typing::NOT_INFERED_ID), params(std::move(params)) {
+function_declaration::function_declaration(const std::string &name, std::unique_ptr<type_call> &type, std::vector<std::unique_ptr<function_declaration_parameter> > &params)
+    : name(name), type(std::move(type)), body(nullptr), type_ind(typing::NOT_INFERED_ID), params(std::move(params)) {
 }
 
 void function_declaration::print(std::ostream &out, const size_t ident) const {
     const std::string tabulation = std::string(ident, '\t');
 
-    out << tabulation << "function " << this->name << " : " << this->type_hint << std::endl;
+    out << tabulation << "function " << this->name << " : ";
+
+	this->type->print(out, ident + 1);
+
+	out << std::endl;
     for(const auto &param : this->params) {
         param->print(out, ident + 1);
     }
@@ -34,13 +38,11 @@ void function_declaration::print(std::ostream &out, const size_t ident) const {
 void function_declaration::try_infering_type(parsing::context &ctx) {
     if(this->type_ind != typing::NOT_INFERED_ID) { return; }
 
-    const auto res = ctx.type_system.find_type(this->type_hint);
-    assert(res);
-
-    this->type_ind = res.value();
+    this->type_ind = this->type->type_ind;
 }
 
 void function_declaration::compile(std::ostream &out, parsing::context &ctx) {
+	this->type->compile(out, ctx);
 	this->try_infering_type(ctx);
 
 	this->return_size = ctx.type_system.all_types[this->type_ind]->size;

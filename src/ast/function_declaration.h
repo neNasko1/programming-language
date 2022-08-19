@@ -12,16 +12,16 @@ namespace grammar {
 
 struct function_declaration : public global_declaration {
     const std::string name;
-    const std::string type_hint;
-    const std::unique_ptr<statement> body;
+    std::unique_ptr<type_call> type;
+    std::unique_ptr<list_statement> body;
     const std::vector<std::unique_ptr<function_declaration_parameter> > params;
 
     size_t type_ind;
     size_t return_size;
     size_t args_size;
 
-    function_declaration(const std::string &name, const std::string &type_hint, std::unique_ptr<statement> body, std::vector<std::unique_ptr<function_declaration_parameter> > &params);
-    function_declaration(const std::string &name, const std::string &type_hint, std::vector<std::unique_ptr<function_declaration_parameter> > &params);
+    function_declaration(const std::string &name, std::unique_ptr<type_call> &type, std::unique_ptr<list_statement> &body, std::vector<std::unique_ptr<function_declaration_parameter> > &params);
+    function_declaration(const std::string &name, std::unique_ptr<type_call> &type, std::vector<std::unique_ptr<function_declaration_parameter> > &params);
     ~function_declaration() = default;
 
     void print(std::ostream &out, const size_t identation) const;

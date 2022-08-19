@@ -9,7 +9,7 @@
 
 namespace grammar {
 
-binary_expression::binary_expression(std::unique_ptr<expression> lft, const lexing::token &op, std::unique_ptr<expression> rght)
+binary_expression::binary_expression(std::unique_ptr<expression> &lft, const lexing::token &op, std::unique_ptr<expression> &rght)
     : lft(std::move(lft)), op(op), rght(std::move(rght)) {}
 
 void binary_expression::print(std::ostream &out, const size_t ident) const {
@@ -46,13 +46,10 @@ void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 	this->lft->compile(out, ctx);
 	this->rght->compile(out, ctx);
 
+	out << "\t ; binary_expression " << lexing::reverse_token_type_names[this->op.type] << std::endl;
+
 	const auto lft_tid = this->lft->memory->type_ind;
 	const auto lft_uref = ctx.type_system.unwrap_ref(lft_tid);
-
-	const auto rght_tid = this->rght->memory->type_ind;
-	const auto rght_uref = ctx.type_system.unwrap_ref(rght_tid);
-
-	out << "\t ; binary_expression " << lexing::reverse_token_type_names[this->op.type] << std::endl;
 
 	if(lft_uref.second) {
 		out << "\t lea rcx, [rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
@@ -63,6 +60,9 @@ void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 	} else {
 		out << "\t mov rax, [rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
 	}
+
+	const auto rght_tid = this->rght->memory->type_ind;
+	const auto rght_uref = ctx.type_system.unwrap_ref(rght_tid);
 
 	if(rght_uref.second) {
 		out << "\t lea rcx, [rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";

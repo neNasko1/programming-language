@@ -94,7 +94,7 @@ std::unique_ptr<grammar::expression> parser::parse_expression() {
 
             auto rght = std::move(expression_stack.top()); expression_stack.pop();
             auto lft = std::move(expression_stack.top()); expression_stack.pop();
-            expression_stack.push(std::make_unique<grammar::binary_expression>(std::move(lft), op, std::move(rght)));
+            expression_stack.push(std::make_unique<grammar::binary_expression>(lft, op, rght));
         }
     };
 
@@ -276,17 +276,16 @@ std::unique_ptr<grammar::function_declaration> parser::parse_function_declaratio
         }
     }
 
-    const auto type_token = this->advance();
-    assert(type_token.type == lexing::token_type::IDENTIFIER);
+    auto type = this->parse_type_call();
 
 	// Extern functions have no body
 	if(this->match(lexing::token_type::SEMICOLON)) {
-		return std::make_unique<grammar::function_declaration>(name_token.value, type_token.value, params);
+		return std::make_unique<grammar::function_declaration>(name_token.value, type, params);
 	}
 
     auto body = this->parse_list_statement();
 
-    return std::make_unique<grammar::function_declaration>(name_token.value, type_token.value, std::move(body), params);
+    return std::make_unique<grammar::function_declaration>(name_token.value, type, body, params);
 }
 
 std::unique_ptr<grammar::global_declaration> parser::parse_definition() {

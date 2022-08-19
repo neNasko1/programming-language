@@ -15,7 +15,7 @@ struct binary_expression : public expression {
     const lexing::token op;
     const std::unique_ptr<expression> rght;
 
-    binary_expression(std::unique_ptr<expression> lft, const lexing::token &op, std::unique_ptr<expression> rght);
+    binary_expression(std::unique_ptr<expression> &lft, const lexing::token &op, std::unique_ptr<expression> &rght);
     ~binary_expression() = default;
 
     void print(std::ostream &out, const size_t identation) const;

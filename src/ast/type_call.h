@@ -11,7 +11,7 @@ namespace grammar {
 
 struct type_call : public ast_node {
     const std::string name;
-    std::vector<std::unique_ptr<type_call> > args;
+    const std::vector<std::unique_ptr<type_call> > args;
 
     std::string internal_name;
     size_t type_ind;
