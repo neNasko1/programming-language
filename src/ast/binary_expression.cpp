@@ -26,57 +26,55 @@ void binary_expression::try_infering_type(parsing::context &ctx) {
 	this->lft->try_infering_type(ctx);
 	this->rght->try_infering_type(ctx);
 
-	// Check if this is i64 or &<i64>
-	const auto lft_tid = this->lft->memory->type_ind;
-	const auto lft_uref = ctx.type_system.unwrap_ref(lft_tid);
-	assert(lft_uref.first == typing::I64_ID);
-
-	// Check if this is i64 or &<i64>
-	const auto rght_tid = this->rght->memory->type_ind;
-	const auto rght_uref = ctx.type_system.unwrap_ref(rght_tid);
-	assert(lft_uref.first == typing::I64_ID);
-
+	// TODO: Skip this function
 	this->memory->type_ind = typing::I64_ID;
 }
 
 void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 	this->try_infering_type(ctx);
-	assert(this->memory->type_ind == typing::I64_ID); // TODO: Handle different types of expressions
 
 	this->lft->compile(out, ctx);
 	this->rght->compile(out, ctx);
 
 	out << "\t ; binary_expression " << lexing::reverse_token_type_names[this->op.type] << std::endl;
 
-	const auto lft_tid = this->lft->memory->type_ind;
-	const auto lft_uref = ctx.type_system.unwrap_ref(lft_tid);
+	const auto load_rax_rcx_arithmetic = [&]() {
+		const auto lft_tid = this->lft->memory->type_ind;
+		const auto lft_uref = ctx.type_system.unwrap_ref(lft_tid);
 
-	if(lft_uref.second) {
-		out << "\t lea rcx, [rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
-		for(size_t i = 0; i < lft_uref.second; i ++) {
-			out << "\t mov rcx, [rcx]\n";
+		assert(lft_uref.first == typing::I64_ID);
+
+		if(lft_uref.second) {
+			out << "\t lea rcx, [rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
+			for(size_t i = 0; i < lft_uref.second; i ++) {
+				out << "\t mov rcx, [rcx]\n";
+			}
+			out << "\t mov rax, [rcx]\n";
+		} else {
+			out << "\t mov rax, [rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
 		}
-		out << "\t mov rax, [rcx]\n";
-	} else {
-		out << "\t mov rax, [rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
-	}
 
-	const auto rght_tid = this->rght->memory->type_ind;
-	const auto rght_uref = ctx.type_system.unwrap_ref(rght_tid);
+		const auto rght_tid = this->rght->memory->type_ind;
+		const auto rght_uref = ctx.type_system.unwrap_ref(rght_tid);
 
-	if(rght_uref.second) {
-		out << "\t lea rcx, [rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
-		for(size_t i = 0; i < rght_uref.second; i ++) {
+		assert(rght_uref.first == typing::I64_ID);
+
+		if(rght_uref.second) {
+			out << "\t lea rcx, [rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
+			for(size_t i = 0; i < rght_uref.second; i ++) {
+				out << "\t mov rcx, [rcx]\n";
+			}
 			out << "\t mov rcx, [rcx]\n";
+		} else {
+			out << "\t mov rcx, [rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
 		}
-		out << "\t mov rcx, [rcx]\n";
-	} else {
-		out << "\t mov rcx, [rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
-	}
 
+		this->memory->type_ind = typing::I64_ID;
+	};
 
 	switch(this->op.type) {
 		case lexing::token_type::PLUS: {
+			load_rax_rcx_arithmetic();
 			out << "\t add rax, rcx\n";
 
             const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type_ind]->size;
@@ -87,6 +85,7 @@ void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 			break;
 		}
 		case lexing::token_type::MINUS: {
+			load_rax_rcx_arithmetic();
 			out << "\t sub rax, rcx\n";
 
             const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type_ind]->size;
@@ -97,6 +96,7 @@ void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 			break;
 		}
 		case lexing::token_type::STAR: {
+			load_rax_rcx_arithmetic();
 			out << "\t mul rcx\n";
 
             const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type_ind]->size;
@@ -107,6 +107,7 @@ void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 			break;
 		}
 		case lexing::token_type::SLASH: {
+			load_rax_rcx_arithmetic();
 			out << "\t div rcx\n";
 
             const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type_ind]->size;
@@ -117,6 +118,7 @@ void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 			break;
 		}
 		case lexing::token_type::MODULO: {
+			load_rax_rcx_arithmetic();
 			out << "\t div rcx\n";
 
             const size_t TYPE_SIZE = ctx.type_system.all_types[this->memory->type_ind]->size;

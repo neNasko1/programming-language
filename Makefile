@@ -35,7 +35,6 @@ test_compiler:
 	./test.sh
 
 recompile:
-	@make clear
 	g++ $(SRC_FILES) $(CPPFLAGS) $(CXXFLAGS) -o $(EXECUTABLE)
 	@make test_compiler
 
