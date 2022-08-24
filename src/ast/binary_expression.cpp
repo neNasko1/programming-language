@@ -5,6 +5,7 @@
 #include "../grammar.h"
 #include "../lexing.h"
 #include "../parsing.h"
+#include "../asm_helper.h"
 #include "binary_expression.h"
 
 namespace grammar {
@@ -125,6 +126,35 @@ void binary_expression::compile(std::ostream &out, parsing::context &ctx) {
 			ctx.func_stack_ptr += TYPE_SIZE;
 			this->memory->stack_ptr = ctx.func_stack_ptr;
             out << "\t push rdx" << "\n";
+
+			break;
+		}
+		case lexing::token_type::EQUAL: {
+			const auto lft_tid = this->lft->memory->type_ind;
+			const auto lft_uref = ctx.type_system.unwrap_ref(lft_tid);
+
+			const auto rght_tid = this->rght->memory->type_ind;
+			const auto rght_uref = ctx.type_system.unwrap_ref(rght_tid);
+
+			assert(lft_uref.second >= 1);
+			assert(lft_uref.first == rght_uref.first);
+
+			out << "\t lea rcx, [rsp+" << ctx.func_stack_ptr - this->lft->memory->stack_ptr << "]\n";
+			for(size_t i = 0; i < lft_uref.second - 1; i ++) {
+				out << "\t mov rcx, [rcx]\n";
+			}
+			out << "\t mov rdx, [rcx]\n";
+
+			out << "\t lea rcx, [rsp+" << ctx.func_stack_ptr - this->rght->memory->stack_ptr << "]\n";
+			if(rght_uref.second) {
+				for(size_t i = 0; i < rght_uref.second - 1; i ++) {
+					out << "\t mov rcx, [rcx]\n";
+				}
+			}
+
+			this->memory->type_ind = typing::VOID_ID;
+
+			asm_helper::mem_move(out, "rcx", "rdx", ctx.type_system.all_types[lft_uref.first]->size);
 
 			break;
 		}
